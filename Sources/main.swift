@@ -27,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ note: Notification) {
         Fonts.register()
         if CommandLine.arguments.contains("-benchocr") { benchOCR(); return }
+        if CommandLine.arguments.contains("-reporttest") { reportTest(); return }
         if let i = CommandLine.arguments.firstIndex(of: "-snapshot"), i + 1 < CommandLine.arguments.count {
             Snapshot.render(to: CommandLine.arguments[i + 1])
             exit(0)
@@ -87,6 +88,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func setGlyph(_ g: Glyph) { statusItem.button?.image = g.image }
+
+    /// 시험: 리포트 신호 하나와 경고 하나를 보내고 끝낸다. `JJ_REPORT_TEST=1 Jupjup -reporttest`
+    /// 대시보드에서 TelemetryDeck "report.test" 신호와 Sentry "report.test" 경고가 보이면 연결된 것
+    private func reportTest() {
+        print("키: sentry \(Reporting.sentryDSN.isEmpty ? "없음" : "있음") · telemetry \(Reporting.telemetryAppID.isEmpty ? "없음" : "있음") · 설정 \(Settings.shared.reports ? "켬" : "끔")")
+        Reporting.start()
+        Reporting.signal("report.test", ["from": "cli"])
+        Reporting.error("report.test", ["from": "cli"])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { // 전송할 시간을 준다
+            print("보냄: report.test (신호·경고). 대시보드에서 확인")
+            exit(0)
+        }
+    }
 
     /// 처음 설치해 켰을 때 한 번만 "맥을 켜면 함께 열기"를 켠다. 나중에 메뉴에서 끄면 다시 켜지 않는다
     private func enableLoginOnFirstRun() {
