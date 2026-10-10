@@ -1,4 +1,4 @@
-# 올릴 때마다: Universal 빌드 → 표 채점 · 12개 언어 인식 · 화면 멈춤 측정(tools/run_tests.sh)
+# 올릴 때마다: Universal 빌드 → 표 채점 · 12개 언어 인식 · QR 스타일 15종 · 화면 멈춤 측정(tools/run_tests.sh)
 name: CI
 
 on:
@@ -26,7 +26,7 @@ jobs:
             -derivedDataPath build/dd -quiet build
           lipo -archs build/dd/Build/Products/Release/Jupjup.app/Contents/MacOS/Jupjup
 
-      - name: 시험 (표 · 언어 · 멈춤)
+      - name: 시험 (표 · 언어 · QR · 멈춤)
         run: tools/run_tests.sh build/dd/Build/Products/Release/Jupjup.app
 
       - name: 표 채점 그림 보관
