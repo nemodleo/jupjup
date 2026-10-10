@@ -34,10 +34,20 @@ struct Table {
     }
 }
 
+/// QR·바코드 하나. 내용은 글로 붙고, 종류는 알림 덧말에 쓴다
+struct Code {
+    var rect: CGRect
+    var payload: String
+    /// QR·데이터매트릭스 같은 2차원 코드면 true, 줄무늬 바코드면 false
+    var isQR: Bool
+}
+
 struct Recognized {
     /// 위→아래 줄, 각 줄은 왼→오른쪽 조각
     var lines: [[Piece]]
     var table: Table?
+    /// 같이 읽힌 QR·바코드(내용은 lines 끝에 한 줄씩 들어 있다)
+    var codes: [Code] = []
 
     var text: String {
         lines.map { $0.map(\.text).joined(separator: " ") }.joined(separator: "\n")
@@ -63,6 +73,33 @@ struct Recognized {
 }
 
 enum Recognizer {
+    /// QR·바코드. 글자 인식과 별개 요청이라 빠르게·정확하게 어느 모드에서나 돈다. 같은 내용은 한 번만
+    static func codes(_ image: CGImage) -> [Code] {
+        let req = VNDetectBarcodesRequest()
+        try? VNImageRequestHandler(cgImage: image).perform([req])
+        let w = CGFloat(image.width), h = CGFloat(image.height)
+        let flat: Set<VNBarcodeSymbology> = [.ean8, .ean13, .upce, .code39, .code39Checksum, .code39FullASCII, .code39FullASCIIChecksum,
+                                             .code93, .code93i, .code128, .i2of5, .i2of5Checksum, .itf14, .codabar]
+        var seen = Set<String>()
+        return (req.results ?? []).compactMap { o in
+            guard let s = o.payloadStringValue?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty, seen.insert(s).inserted else { return nil }
+            let b = o.boundingBox
+            return Code(rect: CGRect(x: b.minX * w, y: b.minY * h, width: b.width * w, height: b.height * h),
+                        payload: s, isQR: !flat.contains(o.symbology))
+        }
+        .sorted { $0.rect.maxY > $1.rect.maxY } // 위에 있는 것부터
+    }
+
+    /// 코드 내용을 글 뒤에 한 줄씩 붙인다. 글자 인식이 코드 안의 글을 이미 읽었으면 중복이라 뺀다
+    static func merge(_ r: Recognized, codes: [Code]) -> Recognized {
+        guard !codes.isEmpty else { return r }
+        var out = r
+        let have = Set(r.lines.map { $0.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces) })
+        out.codes = codes
+        for c in codes where !have.contains(c.payload) { out.lines.append([Piece(rect: c.rect, text: c.payload)]) }
+        return out
+    }
+
     /// Vision은 목록 맨 앞 언어로 글자 모델을 하나 고르고, 그 모델이 모르는 문자는 읽지 못한다
     /// (한국어가 앞이면 일본어·중국어는 0자, 프랑스어 악센트·베트남어 성조도 빠짐). 자동 감지는 섞인 글을 망친다(실측).
     /// 그래서:

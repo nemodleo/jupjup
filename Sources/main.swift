@@ -179,6 +179,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     // 정확하게: Vision이 못 읽었으면 라이브 텍스트로 한 번 더
                     if result.isEmpty, !fast, let live = await LiveText.read(image) { result = live }
                 }
+                result = Recognizer.merge(result, codes: Recognizer.codes(image)) // QR·바코드는 어느 모드에서나
                 let done = result
                 await MainActor.run { self.deliver(done) }
             }
@@ -194,6 +195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Reporting.signal("capture.done", ["mode": mode, "lines": Reporting.bucket(result.lines.count),
                                               "chars": Reporting.bucket(result.text.count),
                                               "table": result.table == nil ? "no" : "yes",
+                                              "code": result.codes.isEmpty ? "no" : result.codes.contains { $0.isQR } ? "qr" : "bar",
                                               "seconds": Reporting.seconds(Date().timeIntervalSince(captureStart))])
         }
         if result.isEmpty {
@@ -619,7 +621,9 @@ enum Snapshot {
         let toast = ToastModel()
         toast.result = sample
         toast.asTable = sample.table != nil
-        let actions = ToastView.Actions(toggleTable: {}, toggleJoin: {}, edit: {}, commitEdit: {}, cancelEdit: {}, undo: {})
+        let actions = ToastView.Actions(toggleTable: {}, toggleJoin: {}, edit: {}, commitEdit: {}, cancelEdit: {}, undo: {}, open: {})
+        let qrURL = "https://github.com/nemodleo/jupjup"
+        let qr = Recognized(lines: [[Piece(rect: .zero, text: qrURL)]], table: nil, codes: [Code(rect: .zero, payload: qrURL, isQR: true)])
         let text = Recognized(lines: [[Piece(rect: .zero, text: "최소제곱법은 잔차의 제곱합을 최소로 만드는 계수를 찾는 방법이다.")],
                                       [Piece(rect: .zero, text: "이때 오차항은 서로 독립이며 평균이 0, 분산이 일정하다고 가정한다.")]], table: nil)
         for (name, appearance) in [("light", NSAppearance(named: .aqua)!), ("dark", NSAppearance(named: .darkAqua)!)] {
@@ -632,6 +636,8 @@ enum Snapshot {
                 save(ToastView(model: toast, actions: actions), "\(dir)/toast-table-hover-\(name).png")
                 let t2 = ToastModel(); t2.result = text; t2.kind = .picked
                 save(ToastView(model: t2, actions: actions), "\(dir)/toast-text-\(name).png")
+                let tq = ToastModel(); tq.result = qr; tq.kind = .picked
+                save(ToastView(model: tq, actions: actions), "\(dir)/toast-qr-\(name).png")
                 t2.kind = .working
                 save(ToastView(model: t2, actions: actions), "\(dir)/toast-working-\(name).png")
                 t2.busyCPU = 94

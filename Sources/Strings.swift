@@ -87,6 +87,7 @@ struct Strings {
     var editedMeta: (Int) -> String
     var moreRows: (Int) -> String
     var asText, asTable, keepLines, joinOne, edit, undo, cancel, save, done: String
+    var qr, barcode, open: String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
     var escCancel: String
@@ -125,6 +126,7 @@ struct Strings {
         moreRows = { $0 == 1 ? v("moreRowsOne") : fill("moreRows", ["n": "\($0)"]) }
         asText = v("asText"); asTable = v("asTable"); keepLines = v("keepLines"); joinOne = v("joinOne")
         edit = v("edit"); undo = v("undo"); cancel = v("cancel"); save = v("save"); done = v("done")
+        qr = v("qr"); barcode = v("barcode"); open = v("open")
         pickWindow = v("pickWindow"); spaceDrag = v("spaceDrag"); dragSelect = v("dragSelect"); spaceWindow = v("spaceWindow")
         sameSpot = { fill("sameSpot", ["s": $0]) }
         escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = v("aboutBody")

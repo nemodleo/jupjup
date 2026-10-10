@@ -56,7 +56,18 @@ final class ToastModel: ObservableObject {
         let t = L.s
         if edited != nil { return t.editedMeta(copiedText.count) }
         if asTable, let tb = result.table { return t.tableMeta(tb.rows.count, tb.columnCount) }
-        return t.textMeta(joined ? 1 : result.lines.count, copiedText.count)
+        let text = t.textMeta(joined ? 1 : result.lines.count, copiedText.count)
+        // QR·바코드가 섞여 있으면 종류를 앞에: "QR · 한 줄 · 38자"
+        guard let c = result.codes.first else { return text }
+        return (c.isQR ? t.qr : t.barcode) + " · " + text
+    }
+
+    /// 담은 글이 열 수 있는 주소(QR의 링크 등)면 그 주소. 고쳐 쓴 뒤에는 고친 글로 본다
+    var link: URL? {
+        let s = copiedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !s.contains("\n"), let u = URL(string: s), let scheme = u.scheme?.lowercased(),
+              ["http", "https", "mailto", "tel", "sms", "facetime"].contains(scheme) else { return nil }
+        return u
     }
 
     var preview: String {
@@ -148,7 +159,13 @@ final class ToastController {
             edit: { [weak self] in self?.beginEdit() },
             commitEdit: { [weak self] in self?.commitEdit() },
             cancelEdit: { [weak self] in self?.endEdit() },
-            undo: { [weak self] in self?.undo() }
+            undo: { [weak self] in self?.undo() },
+            open: { [weak self] in
+                guard let self, let u = self.model.link else { return }
+                NSWorkspace.shared.open(u)
+                Reporting.signal("toast.open", ["scheme": u.scheme ?? ""])
+                self.hide()
+            }
         ))
         let h = NSHostingView(rootView: view)
         p.contentView = h
@@ -244,6 +261,7 @@ struct ToastView: View {
         var commitEdit: () -> Void
         var cancelEdit: () -> Void
         var undo: () -> Void
+        var open: () -> Void
     }
 
     @ObservedObject var model: ToastModel
@@ -287,6 +305,7 @@ struct ToastView: View {
         guard model.kind == .picked, !model.editing else { return 300 }
         let t = L.s
         var labels = [t.edit, t.undo]
+        if model.link != nil { labels.append(t.open) }
         if model.edited == nil {
             if model.result.table != nil { labels.append(model.asTable ? t.asText : t.asTable) }
             if !model.asTable && model.result.lines.count > 1 { labels.append(model.joined ? t.keepLines : t.joinOne) }
@@ -387,7 +406,9 @@ struct ToastView: View {
                 }
             }
             ToastButton(title: L.s.edit, action: actions.edit)
-            ToastButton(title: L.s.undo, strong: true, action: actions.undo)
+            ToastButton(title: L.s.undo, strong: model.link == nil, action: actions.undo)
+            // QR의 링크·메일·전화면 바로 열기. 이때는 열기가 주 동작
+            if model.link != nil { ToastButton(title: L.s.open, strong: true, action: actions.open) }
         }
         .padding(.top, 6)
         .overlay(alignment: .top) { Rectangle().fill(Color.inkRule).frame(height: 1) }

@@ -43,6 +43,7 @@ Everything runs on your Mac. No account, no server, nothing leaves the machine u
 | **One shortcut** | ⇧⌘2 (change it in the menu) → drag to select → the text is on your clipboard |
 | **Two modes** | *Fast* (Live Text) or *Accurate* (Vision, tables, multi-script). Switch in the menu, or press **1** / **2** while selecting |
 | **Tables** | Detected automatically; copied as TSV + HTML |
+| **QR codes & barcodes** | Read alongside text in either mode; a link gets an **Open** button in the notification |
 | **Whole window** | Press **Space** while selecting to pick a window instead |
 | **Same spot again** | Press the shortcut again while selecting to reuse the last area |
 | **Fix it before you paste** | Hover the notification: join lines, edit, or **Undo** (restores your previous clipboard) |
