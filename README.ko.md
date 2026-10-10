@@ -15,6 +15,7 @@
   <img alt="35개 언어" src="https://img.shields.io/badge/화면%20언어-35개-C4553A">
   <a href="LICENSE"><img alt="GPL-3.0" src="https://img.shields.io/badge/license-GPL--3.0-1F1D1A"></a>
   <img alt="베타" src="https://img.shields.io/badge/status-beta-C4553A">
+  <a href="https://github.com/nemodleo/jupjup/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/nemodleo/jupjup/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 <p align="center">
