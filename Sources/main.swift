@@ -29,6 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Fonts.register()
         if CommandLine.arguments.contains("-benchocr") { benchOCR(); return }
         if CommandLine.arguments.contains("-reporttest") { reportTest(); return }
+        if let i = CommandLine.arguments.firstIndex(of: "-read"), i + 1 < CommandLine.arguments.count { readFile(CommandLine.arguments[i + 1]); return }
         if let i = CommandLine.arguments.firstIndex(of: "-snapshot"), i + 1 < CommandLine.arguments.count {
             Snapshot.render(to: CommandLine.arguments[i + 1])
             exit(0)
@@ -144,6 +145,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     print(String(format: "인식 %.2fs · 메인 스레드 최장 멈춤 %.0fms · 틱 %d · %d줄 · 글자 %d", Date().timeIntervalSince(start), worst * 1000, ticks, r.lines.count, r.text.filter { !$0.isWhitespace }.count))
                     exit(0)
                 }
+            }
+        }
+    }
+
+    /// 진단: PNG 한 장을 실제 줍기와 같은 경로(설정의 모드 → 코드 → 병합)로 읽어 표준 출력에. `Jupjup -read <png>`
+    private func readFile(_ path: String) {
+        guard let img = NSImage(contentsOfFile: path)?.cgImage(forProposedRect: nil, context: nil, hints: nil) else { print("못 열음: \(path)"); exit(1) }
+        let fast = Settings.shared.fastMode
+        Task.detached(priority: .userInitiated) {
+            let start = Date()
+            var r: Recognized
+            if fast, let live = await LiveText.read(img) { r = live } else { r = Recognizer.recognize(img) }
+            let codes = Recognizer.codes(img)
+            r = Recognizer.merge(r, codes: codes)
+            await MainActor.run {
+                let m = ToastModel(); m.result = r
+                print("\(img.width)×\(img.height) · \(fast ? "빠르게" : "정확하게") · \(String(format: "%.2f", Date().timeIntervalSince(start)))s")
+                print("코드 \(codes.count)개: " + codes.map { "\($0.isQR ? "QR" : "바코드") \($0.payload)" }.joined(separator: " | "))
+                print("덧말: \(m.meta) · 열기: \(m.link?.absoluteString ?? "없음")")
+                print("글:\n\(r.text)")
+                exit(0)
             }
         }
     }

@@ -58,13 +58,19 @@ final class ToastModel: ObservableObject {
         if asTable, let tb = result.table { return t.tableMeta(tb.rows.count, tb.columnCount) }
         let text = t.textMeta(joined ? 1 : result.lines.count, copiedText.count)
         // QR·바코드가 섞여 있으면 종류를 앞에: "QR · 한 줄 · 38자"
-        guard let c = result.codes.first else { return text }
-        return (c.isQR ? t.qr : t.barcode) + " · " + text
+        guard !result.codes.isEmpty else { return text }
+        return (result.codes.contains { $0.isQR } ? t.qr : t.barcode) + " · " + text
     }
 
-    /// 담은 글이 열 수 있는 주소(QR의 링크 등)면 그 주소. 고쳐 쓴 뒤에는 고친 글로 본다
+    /// 열 수 있는 주소. QR·바코드가 있으면 그 내용(옆 글자가 같이 잡혀도), 없으면 담은 글 전체가 주소일 때.
+    /// 고쳐 쓴 뒤에는 고친 글로 본다
     var link: URL? {
-        let s = copiedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if edited == nil, let u = result.codes.lazy.compactMap({ Self.openable($0.payload) }).first { return u }
+        return Self.openable(copiedText)
+    }
+
+    private static func openable(_ s: String) -> URL? {
+        let s = s.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !s.contains("\n"), let u = URL(string: s), let scheme = u.scheme?.lowercased(),
               ["http", "https", "mailto", "tel", "sms", "facetime"].contains(scheme) else { return nil }
         return u

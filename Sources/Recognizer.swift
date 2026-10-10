@@ -90,13 +90,15 @@ enum Recognizer {
         .sorted { $0.rect.maxY > $1.rect.maxY } // 위에 있는 것부터
     }
 
-    /// 코드 내용을 글 뒤에 한 줄씩 붙인다. 글자 인식이 코드 안의 글을 이미 읽었으면 중복이라 뺀다
+    /// 코드 내용을 글 맨 앞에 한 줄씩 둔다(QR을 골랐으면 그 내용이 주인공, 옆 글자는 덤).
+    /// 글자 인식이 코드 밑 숫자 같은 걸 이미 읽었으면 그 줄은 빼서 겹치지 않게 한다
     static func merge(_ r: Recognized, codes: [Code]) -> Recognized {
         guard !codes.isEmpty else { return r }
         var out = r
-        let have = Set(r.lines.map { $0.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces) })
+        let payloads = Set(codes.map(\.payload))
         out.codes = codes
-        for c in codes where !have.contains(c.payload) { out.lines.append([Piece(rect: c.rect, text: c.payload)]) }
+        out.lines = codes.map { [Piece(rect: $0.rect, text: $0.payload)] }
+            + r.lines.filter { !payloads.contains($0.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)) }
         return out
     }
 
