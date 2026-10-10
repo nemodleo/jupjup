@@ -211,7 +211,8 @@ final class ToastController {
             model.hovering = inside
             relayout()
         }
-        if inside || model.editing {
+        // 마우스가 위에 있거나, 고치는 중이거나, 글을 긁으려고 창을 눌러 둔 동안은 머문다
+        if inside || model.editing || panel.isKeyWindow {
             hideAt = Date().addingTimeInterval(1.2)
         } else if let t = hideAt, Date() > t {
             hide()
@@ -343,13 +344,15 @@ struct ToastView: View {
             if !model.editing, model.asTable, model.edited == nil, let t = model.result.table {
                 tablePreview(t)
             } else if !model.editing {
+                // 마우스를 올리면 더 보이고, 끌어서 일부만 골라 ⌘C 할 수 있다
                 Text(model.preview)
                     .font(.system(size: 12))
                     .foregroundStyle(Color.inkSub)
                     .lineSpacing(1)
-                    .lineLimit(model.hovering ? 6 : 2)
+                    .lineLimit(model.hovering ? 10 : 2)
                     .truncationMode(.tail)
                     .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
             }
         case .working:
             title(L.s.working, L.s.workingSub)
@@ -391,6 +394,7 @@ struct ToastView: View {
                         Text(rows[i][j]).lineLimit(1)
                             .font(.system(size: 12, weight: i == 0 ? .medium : .regular))
                             .foregroundStyle(i == 0 ? Color.inkText : Color.inkSub)
+                            .textSelection(.enabled)
                     }
                 }
             }

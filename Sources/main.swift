@@ -34,6 +34,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Snapshot.render(to: CommandLine.arguments[i + 1])
             exit(0)
         }
+        installEditMenu()
         _ = Settings.shared
         statusItem.autosaveName = "jupjup"
         if let b = statusItem.button {
@@ -147,6 +148,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+    }
+
+    /// 메뉴 막대 앱이라 보이는 메뉴는 없지만, ⌘C·⌘V·⌘A 같은 키는 메인 메뉴의 편집 항목을 거쳐야 먹는다.
+    /// 알림에서 글을 긁어 복사하거나 고쳐 담기에 붙여넣을 때 필요하다
+    private func installEditMenu() {
+        let main = NSMenu()
+        let edit = NSMenuItem(); main.addItem(edit)
+        let m = NSMenu(title: "Edit"); edit.submenu = m
+        m.addItem(withTitle: "Undo", action: Selector(("undo:")), keyEquivalent: "z")
+        m.addItem(withTitle: "Cut", action: #selector(NSText.cut(_:)), keyEquivalent: "x")
+        m.addItem(withTitle: "Copy", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        m.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
+        m.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        NSApp.mainMenu = main
     }
 
     /// 진단: PNG 한 장을 실제 줍기와 같은 경로(설정의 모드 → 코드 → 병합)로 읽어 표준 출력에. `Jupjup -read <png>`
