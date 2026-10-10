@@ -8,9 +8,14 @@ set -e
 cd "$(dirname "$0")"
 BUILD="${TMPDIR:-/tmp}/jupjup-build"   # iCloud 폴더 밖에서 빌드 (codesign xattr 문제)
 [ -f report.env ] && source report.env
+# 서명: tools/make_cert.sh로 만든 "Jupjup Dev"가 있으면 그걸로(빌드해도 화면 기록 권한이 유지됨), 없으면 애드혹(-)
+IDENTITY="-"
+security find-identity -v -p codesigning 2>/dev/null | grep -q '"Jupjup Dev"' && IDENTITY="Jupjup Dev"
+[ "$IDENTITY" = "-" ] && echo "애드혹 서명 (tools/make_cert.sh를 한 번 실행하면 권한이 안 풀림)"
 xcodegen generate --quiet
 xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release -derivedDataPath "$BUILD" \
   JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" \
+  CODE_SIGN_IDENTITY="$IDENTITY" \
   -quiet build
 APP="$BUILD/Build/Products/Release/Jupjup.app"
 pkill -x Jupjup 2>/dev/null && sleep 1 || true

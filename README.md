@@ -69,6 +69,8 @@ cd jupjup
 
 Requires Xcode (tested with 26.3). The first build downloads two Swift packages and takes a few minutes.
 
+> If you rebuild often, run `tools/make_cert.sh` once. It creates a self-signed certificate ("Jupjup Dev") that `build.sh` then signs with, so macOS keeps the Screen Recording permission across rebuilds. Ad-hoc signatures change on every build, which makes macOS ask again each time.
+
 **Releases** — signed and notarized downloads are on the [roadmap](#roadmap).
 
 ### First launch
