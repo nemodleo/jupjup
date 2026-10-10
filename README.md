@@ -36,14 +36,6 @@ There are plenty of screen-OCR tools. Jupjup does three things they don't:
 
 Everything runs on your Mac. No account, no server, nothing leaves the machine unless you keep the optional, counts-only crash/usage reports on.
 
-### The everyday one: lines from a PDF
-
-Copy a paragraph from a PDF and you get a line break at the end of every line, plus a hyphen where a word was split. Jupjup's **Join Lines** fixes both in one click, before you paste.
-
-<p align="center">
-  <img src="docs/images/join-lines.gif" width="760" alt="Selecting four lines in a PDF, then Join Lines in the notification turns them into one line">
-</p>
-
 ## Features
 
 | | |
