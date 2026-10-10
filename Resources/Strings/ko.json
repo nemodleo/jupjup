@@ -81,5 +81,10 @@
  "obClose": "닫기",
  "obTry": "첫 줍기 해 보기",
  "conflict": "단축키를 다른 앱이 쓰고 있어요",
- "conflictSub": "메뉴에서 다른 조합으로 바꿔 주세요"
+ "conflictSub": "메뉴에서 다른 조합으로 바꿔 주세요",
+ "reports": "오류·사용 통계 보내기",
+ "obReports": "오류·사용 통계 보내기",
+ "obReportsBody": "앱이 죽거나 못 읽은 횟수만 보내요. 화면과 글 내용은 절대 보내지 않아요. 언제든 메뉴에서 끌 수 있어요.",
+ "obReportsOn": "기본 켬 · 눌러서 끄기",
+ "obReportsOff": "꺼짐 · 눌러서 켜기"
 }

@@ -42,6 +42,7 @@ final class OnboardingController {
     }
 
     func close() {
+        if !Self.done { Reporting.signal("onboarding.done", ["permission": model.permission ? "yes" : "no"]) }
         Self.done = true
         poll?.invalidate()
         poll = nil
@@ -66,6 +67,7 @@ final class OnboardingController {
             relaunch: { Self.relaunch() },
             later: { [weak self] in self?.close() },
             try: { [weak self] in self?.close(); self?.onTry?() }))
+        Reporting.signal("onboarding.shown")
         let host = NSHostingView(rootView: view)
         w.contentView = host
         w.setContentSize(host.fittingSize)
@@ -148,6 +150,11 @@ struct OnboardingView: View {
                 }
             }
 
+            // 3 · 오류·사용 통계 (기본 켬, 체크를 눌러 끔)
+            step(mark: .check(settings.reports), title: t.obReports, body: t.obReportsBody, toggle: { settings.reports.toggle() }) {
+                Text(settings.reports ? t.obReportsOn : t.obReportsOff).font(.system(size: 12)).foregroundStyle(Color.inkFaint)
+            } sub: { EmptyView() }
+
             HStack(spacing: 8) {
                 Spacer()
                 ObButton(title: ready ? t.obClose : t.obLater, action: actions.later)
@@ -165,10 +172,14 @@ struct OnboardingView: View {
 
     enum Mark { case check(Bool), warn }
 
-    private func step<R: View, S: View>(mark: Mark, title: String, body: String,
+    private func step<R: View, S: View>(mark: Mark, title: String, body: String, toggle: (() -> Void)? = nil,
                                         @ViewBuilder right: () -> R, @ViewBuilder sub: () -> S) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            markView(mark).padding(.top, 1)
+            // 누를 수 있는 건 3단계(리포트)뿐. disabled로 두면 흐려지므로 hit test만 막는다
+            Button { toggle?() } label: { markView(mark).padding(.top, 1).contentShape(Rectangle()) }
+                .buttonStyle(.plain)
+                .allowsHitTesting(toggle != nil)
+                .accessibilityLabel(title)
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
                     Text(title).font(.system(size: 13.5, weight: .semibold)).foregroundStyle(Color.inkText)

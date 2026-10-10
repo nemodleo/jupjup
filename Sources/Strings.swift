@@ -97,6 +97,7 @@ struct Strings {
     var obIntro, obShortcut, obShortcutOK, obPermission, obPermissionOff, obPermissionOn, obOn, obOpenSettings: String
     var obRelaunchNote, obRelaunch, obLater, obClose, obTry, conflict, conflictSub: String
     var obShortcutTaken: (String) -> String
+    var reports, obReports, obReportsBody, obReportsOn, obReportsOff: String
 
     init(code: String) {
         let d = Catalog.raw(code), en = Catalog.raw("en")
@@ -136,6 +137,8 @@ struct Strings {
         obRelaunchNote = v("obRelaunchNote"); obRelaunch = v("obRelaunch"); obLater = v("obLater"); obClose = v("obClose"); obTry = v("obTry")
         conflict = v("conflict"); conflictSub = v("conflictSub")
         obShortcutTaken = { fill("obShortcutTaken", ["s": $0]) }
+        reports = v("reports"); obReports = v("obReports"); obReportsBody = v("obReportsBody")
+        obReportsOn = v("obReportsOn"); obReportsOff = v("obReportsOff")
     }
 }
 

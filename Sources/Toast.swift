@@ -136,8 +136,8 @@ final class ToastController {
         p.hidesOnDeactivate = false
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         let view = ToastView(model: model, actions: .init(
-            toggleTable: { [weak self] in self?.update { $0.asTable.toggle() } },
-            toggleJoin: { [weak self] in self?.update { $0.joined.toggle() } },
+            toggleTable: { [weak self] in self?.update { $0.asTable.toggle(); Reporting.signal("toast.table", ["to": $0.asTable ? "table" : "text"]) } },
+            toggleJoin: { [weak self] in self?.update { $0.joined.toggle(); Reporting.signal("toast.join", ["to": $0.joined ? "one" : "lines"]) } },
             edit: { [weak self] in self?.beginEdit() },
             commitEdit: { [weak self] in self?.commitEdit() },
             cancelEdit: { [weak self] in self?.endEdit() },
@@ -206,6 +206,7 @@ final class ToastController {
     }
 
     private func commitEdit() {
+        Reporting.signal("toast.edit")
         model.edited = model.draft
         model.writeClipboard()
         endEdit()
@@ -219,6 +220,7 @@ final class ToastController {
     }
 
     private func undo() {
+        Reporting.signal("toast.undo")
         model.backup?.restore()
         model.kind = .undone
         model.hovering = false

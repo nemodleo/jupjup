@@ -81,5 +81,10 @@
  "obClose": "Close",
  "obTry": "Try your first capture",
  "conflict": "Shortcut is used by another app",
- "conflictSub": "Pick a different combo in the menu"
+ "conflictSub": "Pick a different combo in the menu",
+ "reports": "Send Error & Usage Reports",
+ "obReports": "Error & usage reports",
+ "obReportsBody": "Only counts of crashes and failed captures. Never your screen or the text. Turn it off any time in the menu.",
+ "obReportsOn": "On by default · click to turn off",
+ "obReportsOff": "Off · click to turn on"
 }

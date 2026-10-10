@@ -156,20 +156,37 @@ final class Settings: ObservableObject {
             d.set(Int(shortcut.carbonMods), forKey: "hotKeyMods")
         }
     }
-    @Published var language: Lang { didSet { d.set(language.rawValue, forKey: "language") } }
+    @Published var language: Lang {
+        didSet {
+            d.set(language.rawValue, forKey: "language")
+            Reporting.signal("language.changed", ["language": language.resolved.rawValue])
+        }
+    }
     /// 읽을 글자: 직접 고르기 / 고른 Vision 코드(목록 순서) / 못 읽으면 다른 글자도
     @Published var ocrManual: Bool { didSet { d.set(ocrManual, forKey: "ocrManual") } }
     @Published var ocrLanguages: [String] { didSet { d.set(ocrLanguages, forKey: "ocrLanguages") } }
     @Published var ocrFallback: Bool { didSet { d.set(ocrFallback, forKey: "ocrFallback") } }
     /// 인식 모드: 빠르게(라이브 텍스트) / 정확하게(Vision, 기본)
-    @Published var fastMode: Bool { didSet { d.set(fastMode, forKey: "fastMode") } }
+    @Published var fastMode: Bool {
+        didSet {
+            d.set(fastMode, forKey: "fastMode")
+            Reporting.signal("mode.changed", ["mode": fastMode ? "fast" : "accurate"])
+        }
+    }
+    /// 오류·사용 통계 보내기(기본 켬). 끄면 그 자리에서 멈춘다
+    @Published var reports: Bool {
+        didSet {
+            d.set(reports, forKey: "reports")
+            if reports { Reporting.start() } else { Reporting.stop() }
+        }
+    }
     /// 메뉴에서 새 단축키를 기다리는 중
     @Published var recording = false
     /// 녹음 결과 안내(쓸 수 없는 조합 등). 잠깐 보였다 사라진다
     @Published var shortcutNote: String?
 
     private init() {
-        d.register(defaults: ["joinLines": false, "tables": true,
+        d.register(defaults: ["joinLines": false, "tables": true, "reports": true,
                               // 노치 뒤로 숨지 않게 오른쪽 끝 가까이 둔다(우연·묵묵과 같은 방법)
                               "NSStatusItem Preferred Position jupjup": 360])
         joinLines = d.bool(forKey: "joinLines")
@@ -179,6 +196,7 @@ final class Settings: ObservableObject {
         ocrLanguages = d.stringArray(forKey: "ocrLanguages") ?? []
         ocrFallback = d.object(forKey: "ocrFallback") as? Bool ?? true
         fastMode = d.bool(forKey: "fastMode")
+        reports = d.bool(forKey: "reports")
         if d.object(forKey: "hotKeyCode") != nil {
             shortcut = Shortcut(keyCode: UInt32(d.integer(forKey: "hotKeyCode")), carbonMods: UInt32(d.integer(forKey: "hotKeyMods")))
         } else {

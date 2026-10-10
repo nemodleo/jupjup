@@ -1,48 +1,19 @@
 #!/bin/zsh
-# 줍줍.app 빌드 → /Applications(응용 프로그램)에 설치하고 다시 연다
+# 줍줍.app 빌드(Universal: 애플 실리콘 + 인텔) → /Applications(응용 프로그램)에 설치하고 다시 연다
+# XcodeGen으로 프로젝트를 만들고 xcodebuild로 빌드한다(Sentry·TelemetryDeck 패키지 때문).
+# 리포트 키는 report.env(git에 안 올림)에서 읽는다:
+#   JJ_SENTRY_DSN=https://...@sentry.io/...
+#   JJ_TELEMETRY_APP_ID=XXXXXXXX-XXXX-...
 set -e
 cd "$(dirname "$0")"
-BUILD="${TMPDIR:-/tmp}/jupjup-build"; APP=$BUILD/Jupjup.app  # iCloud 폴더 밖에서 빌드 (codesign xattr 문제)
-rm -rf $BUILD && mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
-# 애플 실리콘(arm64)·인텔(x86_64) 둘 다 빌드해 Universal 실행 파일로 합친다
-FW="-framework AppKit -framework SwiftUI -framework Vision -framework VisionKit -framework Carbon -framework ServiceManagement -framework ScreenCaptureKit"
-swiftc -O -swift-version 5 -target arm64-apple-macos14.0  Sources/*.swift -o $BUILD/Jupjup-arm64  ${=FW}
-swiftc -O -swift-version 5 -target x86_64-apple-macos14.0 Sources/*.swift -o $BUILD/Jupjup-x86_64 ${=FW}
-lipo -create $BUILD/Jupjup-arm64 $BUILD/Jupjup-x86_64 -output $APP/Contents/MacOS/Jupjup
-cp -R Resources/Fonts $APP/Contents/Resources/
-cp Resources/AppIcon.icns $APP/Contents/Resources/
-cp -R Resources/Strings $APP/Contents/Resources/    # 화면 문구(언어별 JSON)
-# 언어별 앱 이름(Finder·Dock): 한국어만 줍줍, 나머지는 Jupjup
-LOCS=""
-for f in Resources/Strings/*.json; do
-  c=$(basename $f .json); mkdir -p $APP/Contents/Resources/$c.lproj
-  if [ $c = ko ]; then n="줍줍"; else n="Jupjup"; fi
-  printf 'CFBundleDisplayName = "%s";\n' "$n" > $APP/Contents/Resources/$c.lproj/InfoPlist.strings
-  LOCS="$LOCS<string>$c</string>"
-done
-cat > $APP/Contents/Info.plist <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-  <key>CFBundleName</key><string>Jupjup</string>
-  <key>CFBundleDisplayName</key><string>줍줍</string>
-  <key>CFBundleIdentifier</key><string>com.nemo.jupjup</string>
-  <key>CFBundleExecutable</key><string>Jupjup</string>
-  <key>CFBundleIconFile</key><string>AppIcon</string>
-  <key>CFBundleDevelopmentRegion</key><string>ko</string>
-  <key>CFBundleLocalizations</key><array>$LOCS</array>
-  <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>2</string>
-  <key>LSMinimumSystemVersion</key><string>14.0</string>
-  <key>LSUIElement</key><true/>
-  <key>NSHighResolutionCapable</key><true/>
-</dict></plist>
-PLIST
-find $APP -exec xattr -c {} +  # 글꼴·아이콘 복사 때 붙은 iCloud 속성 제거
-codesign --force --sign - $APP
-
+BUILD="${TMPDIR:-/tmp}/jupjup-build"   # iCloud 폴더 밖에서 빌드 (codesign xattr 문제)
+[ -f report.env ] && source report.env
+xcodegen generate --quiet
+xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release -derivedDataPath "$BUILD" \
+  JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" \
+  -quiet build
+APP="$BUILD/Build/Products/Release/Jupjup.app"
 pkill -x Jupjup 2>/dev/null && sleep 1 || true
-rm -rf ~/Applications/Jupjup.app /Applications/Jupjup.app && cp -R $APP /Applications/
+rm -rf /Applications/Jupjup.app && cp -R "$APP" /Applications/
 open /Applications/Jupjup.app
-echo "설치됨: /Applications/Jupjup.app"
+echo "설치됨: /Applications/Jupjup.app ($(lipo -archs /Applications/Jupjup.app/Contents/MacOS/Jupjup))"

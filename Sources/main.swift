@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let hotKey = HotKeyCenter()
     private var recordMonitor: Any?
     private var askedPermission = false
+    private var captureStart = Date()
     private let onboarding = OnboardingController()
 
     func applicationDidFinishLaunching(_ note: Notification) {
@@ -42,14 +43,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         capture.onPicked = { [weak self] image, rect in
             guard let self else { return }
             // 인식을 시작하기 전에 '줍는 중'부터 그린다. 맥이 바쁘면 경고도 함께
+            self.captureStart = Date()
             self.marker.show(rect)
             self.toast.show(.working, busyCPU: self.cpu.busyPercent())
             self.recognize(image)
         }
-        capture.onCancel = { [weak self] in self?.setGlyph(.idle) }
+        capture.onCancel = { [weak self] in self?.setGlyph(.idle); Reporting.signal("capture.cancelled") }
         capture.onError = { [weak self] _ in
             guard let self else { return }
             self.setGlyph(.idle)
+            Reporting.error("capture.failed", ["reason": "permission"])
             // 권한이 없으면 안내 창을 2단계(권한)로 연다. 시스템 권한 창은 앱을 켠 동안 한 번만
             self.onboarding.show()
             if !self.askedPermission {
@@ -57,6 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 CGRequestScreenCaptureAccess()
             }
         }
+        Reporting.start()
         Recognizer.warmUp()
         if Settings.shared.fastMode { LiveText.warmUp() }
         enableLoginOnFirstRun()
@@ -137,6 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         closeMenu(restoreFocus: false)
         marker.dismiss(animated: false)
         setGlyph(.picking)
+        Reporting.signal("capture.started", ["mode": Settings.shared.fastMode ? "fast" : "accurate"])
         capture.start(returnTo: returnTo)
     }
 
@@ -167,6 +172,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func deliver(_ result: Recognized) {
         marker.finish(ok: !result.isEmpty)
+        let mode = Settings.shared.fastMode ? "fast" : "accurate"
+        if result.isEmpty {
+            Reporting.signal("capture.empty", ["mode": mode])
+        } else {
+            Reporting.signal("capture.done", ["mode": mode, "lines": Reporting.bucket(result.lines.count),
+                                              "chars": Reporting.bucket(result.text.count),
+                                              "table": result.table == nil ? "no" : "yes",
+                                              "seconds": Reporting.seconds(Date().timeIntervalSince(captureStart))])
+        }
         if result.isEmpty {
             setGlyph(.idle)
             toast.show(.empty)
@@ -211,6 +225,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             st.shortcut = new
             st.shortcutNote = nil
             onboarding.model.conflict = false
+            Reporting.signal("shortcut.changed")
             endRecording()
         } else {
             st.shortcutNote = L.s.taken(new.text)
@@ -356,6 +371,7 @@ struct MenuView: View {
             textWidth(t.openAtLogin, 12.5) + 8 + 36 + 18,
             textWidth(t.joinLines, 12.5) + 8 + 36 + 18,
             textWidth(t.tables, 12.5) + 8 + 36 + 18,
+            textWidth(t.reports, 12.5) + 8 + 36 + 18,
             textWidth(t.language, 12.5) + 16 + textWidth(lang, 11) + 22,
             textWidth(t.ocrMode, 12.5) + 14 + textWidth(t.modeFast, 11, .semibold) + textWidth(t.modeAccurate, 11, .semibold) + 34 + 10,
             textWidth(t.about, 12.5) + 24,
@@ -413,6 +429,7 @@ struct MenuView: View {
                     .padding(.horizontal, 8).padding(.bottom, 4)
             }
             languageRow
+            toggle(L.s.reports, isOn: $settings.reports)
             rule
             MenuRow(title: L.s.about, action: actions.about)
             MenuRow(title: L.s.quit, trailing: "⌘Q", action: actions.quit)

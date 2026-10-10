@@ -81,5 +81,10 @@
  "obClose": "关闭",
  "obTry": "试试第一次拾取",
  "conflict": "快捷键已被其他应用占用",
- "conflictSub": "请在菜单中更换组合"
+ "conflictSub": "请在菜单中更换组合",
+ "reports": "发送错误与使用统计",
+ "obReports": "错误与使用统计",
+ "obReportsBody": "只发送崩溃和识别失败的次数，绝不发送屏幕或文字内容。可随时在菜单中关闭。",
+ "obReportsOn": "默认开启 · 点击关闭",
+ "obReportsOff": "已关闭 · 点击开启"
 }
