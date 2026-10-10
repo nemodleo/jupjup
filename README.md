@@ -98,6 +98,8 @@ Requires Xcode (tested with 26.3). The first build downloads two Swift packages 
 
 Jupjup never saves, uploads or logs what it reads. Screenshots live in memory for the duration of one capture.
 
+Full policy: [PRIVACY.md](PRIVACY.md).
+
 Optional **error & usage reports** (on by default, one click to turn off in the menu or the first-run window) send only *counts and categories* — "a capture finished, 2–5 lines, under a second, table: no" — to [Sentry](https://sentry.io) (crashes) and [TelemetryDeck](https://telemetrydeck.com) (usage). Never text, never images, never coordinates. The exact list is in `Sources/Reporting.swift`. Builds without report keys send nothing at all.
 
 ## Requirements
