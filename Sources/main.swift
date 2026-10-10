@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var askedPermission = false
     private var captureStart = Date()
     private let onboarding = OnboardingController()
+    private let aboutWindow = AboutController()
 
     func applicationDidFinishLaunching(_ note: Notification) {
         Fonts.register()
@@ -326,11 +327,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func about() {
         closeMenu()
         NSApp.activate(ignoringOtherApps: true)
-        let a = NSAlert()
-        a.messageText = L.s.aboutTitle
-        a.informativeText = L.s.aboutBody
-        a.icon = NSApp.applicationIconImage
-        a.runModal()
+        aboutWindow.show()
     }
 }
 
@@ -437,11 +434,10 @@ struct MenuView: View {
                 .opacity(settings.fastMode ? 0.45 : 1)
                 .disabled(settings.fastMode)
             modeRow
-            if settings.fastMode {
-                Text(L.s.modeFastNote).font(.system(size: 11)).foregroundStyle(Color.inkFaint)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 8).padding(.bottom, 4)
-            }
+            // 두 모드의 차이는 늘 보인다. 정확하게일 때 감추면 왜 표가 되는지 알 길이 없다
+            Text(L.s.modeFastNote).font(.system(size: 11)).foregroundStyle(Color.inkFaint)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 8).padding(.bottom, 4)
             languageRow
             toggle(L.s.reports, isOn: $settings.reports)
             rule
@@ -677,6 +673,10 @@ enum Snapshot {
         Settings.shared.fastMode = true
         save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-fast.png")
         Settings.shared.fastMode = keepFast
+        save(AboutView(), "\(dir)/about.png")
+        Settings.shared.language = Lang(rawValue: "en")
+        save(AboutView(), "\(dir)/about-en.png")
+        Settings.shared.language = .auto
         let lp = MenuState(); lp.page = .language
         save(MenuView(settings: .shared, state: lp, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-auto.png")
         let st = Settings.shared, keep = (st.ocrManual, st.ocrLanguages)
