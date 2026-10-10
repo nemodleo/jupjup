@@ -94,6 +94,9 @@ struct Strings {
     var back, uiText, ocrText, ocrAuto, ocrAutoSub, ocrManual, ocrManualSub, fallback, fallbackSub: String
     var nowSystem: (String) -> String
     var ocrMode, modeFast, modeAccurate, modeFastNote: String
+    var obIntro, obShortcut, obShortcutOK, obPermission, obPermissionOff, obPermissionOn, obOn, obOpenSettings: String
+    var obRelaunchNote, obRelaunch, obLater, obClose, obTry, conflict, conflictSub: String
+    var obShortcutTaken: (String) -> String
 
     init(code: String) {
         let d = Catalog.raw(code), en = Catalog.raw("en")
@@ -128,6 +131,11 @@ struct Strings {
         ocrManual = v("ocrManual"); ocrManualSub = v("ocrManualSub"); fallback = v("fallback"); fallbackSub = v("fallbackSub")
         nowSystem = { fill("nowSystem", ["s": $0]) }
         ocrMode = v("ocrMode"); modeFast = v("modeFast"); modeAccurate = v("modeAccurate"); modeFastNote = v("modeFastNote")
+        obIntro = v("obIntro"); obShortcut = v("obShortcut"); obShortcutOK = v("obShortcutOK"); obPermission = v("obPermission")
+        obPermissionOff = v("obPermissionOff"); obPermissionOn = v("obPermissionOn"); obOn = v("obOn"); obOpenSettings = v("obOpenSettings")
+        obRelaunchNote = v("obRelaunchNote"); obRelaunch = v("obRelaunch"); obLater = v("obLater"); obClose = v("obClose"); obTry = v("obTry")
+        conflict = v("conflict"); conflictSub = v("conflictSub")
+        obShortcutTaken = { fill("obShortcutTaken", ["s": $0]) }
     }
 }
 

@@ -21,6 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let hotKey = HotKeyCenter()
     private var recordMonitor: Any?
     private var askedPermission = false
+    private let onboarding = OnboardingController()
 
     func applicationDidFinishLaunching(_ note: Notification) {
         Fonts.register()
@@ -47,21 +48,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         capture.onCancel = { [weak self] in self?.setGlyph(.idle) }
         capture.onError = { [weak self] _ in
-            self?.setGlyph(.idle)
-            self?.toast.show(.permission)
-            // 시스템 권한 창은 앱을 켠 동안 한 번만 (매번 띄우면 같은 창이 반복된다)
-            guard let self, !self.askedPermission else { return }
-            self.askedPermission = true
-            CGRequestScreenCaptureAccess()
+            guard let self else { return }
+            self.setGlyph(.idle)
+            // 권한이 없으면 안내 창을 2단계(권한)로 연다. 시스템 권한 창은 앱을 켠 동안 한 번만
+            self.onboarding.show()
+            if !self.askedPermission {
+                self.askedPermission = true
+                CGRequestScreenCaptureAccess()
+            }
         }
         Recognizer.warmUp()
         if Settings.shared.fastMode { LiveText.warmUp() }
         enableLoginOnFirstRun()
         hotKey.onPress = { [weak self] in self?.startCapture() }
         if !hotKey.register(Settings.shared.shortcut) {
-            // 저장된 조합을 다른 앱이 쓰고 있으면 기본값으로
+            // 저장된 조합을 다른 앱이 쓰고 있으면 기본값으로. 그것도 안 되면 충돌(TextSniper 등)
             Settings.shared.shortcut = .standard
-            hotKey.register(.standard)
+            onboarding.model.conflict = !hotKey.register(.standard)
+        }
+
+        onboarding.onChangeShortcut = { [weak self] w in self?.startRecording(in: w) }
+        onboarding.onTry = { [weak self] in self?.startCapture() }
+        if !OnboardingController.done {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in self?.onboarding.show() }
+        } else if onboarding.model.conflict {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in self?.toast.show(.conflict) }
         }
     }
 
@@ -173,14 +184,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: 단축키 바꾸기
 
     /// 메뉴의 키 표시를 누르면: 지금 단축키를 잠시 풀고 다음 키 조합을 기다린다
-    private func startRecording() {
+    private func startRecording(in window: NSWindow? = nil) {
         let st = Settings.shared
         guard !st.recording else { return cancelRecording() }
         st.recording = true
         st.shortcutNote = nil
         hotKey.unregister() // 같은 조합을 다시 누를 수 있게
         NSApp.activate(ignoringOtherApps: true)
-        menuPanel?.makeKey()
+        (window ?? menuPanel)?.makeKey()
         recordMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
             MainActor.assumeIsolated { self?.recorded(e) }
             return nil
@@ -199,6 +210,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if hotKey.register(new) {
             st.shortcut = new
             st.shortcutNote = nil
+            onboarding.model.conflict = false
             endRecording()
         } else {
             st.shortcutNote = L.s.taken(new.text)
@@ -207,7 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func cancelRecording() {
-        hotKey.register(Settings.shared.shortcut)
+        onboarding.model.conflict = !hotKey.register(Settings.shared.shortcut)
         Settings.shared.shortcutNote = nil
         endRecording()
     }
@@ -616,6 +628,11 @@ enum Snapshot {
         let up = MenuState(); up.page = .uiLanguage
         save(MenuView(settings: .shared, state: up, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-list.png")
         // 고르기 화면 안내줄(정확하게 / 빠르게). 사용자의 설정은 끝나고 되돌린다
+        for (name, conflict, perm) in [("first", false, false), ("conflict", true, false), ("done", false, true)] {
+            let m = OnboardingModel(); m.conflict = conflict; m.permission = perm
+            let v = OnboardingView(model: m, settings: .shared, actions: .init(changeShortcut: {}, openSettings: {}, relaunch: {}, later: {}, try: {}))
+            save(v, "\(dir)/onboard-\(name).png")
+        }
         let keepFast = Settings.shared.fastMode
         for fast in [false, true] {
             Settings.shared.fastMode = fast

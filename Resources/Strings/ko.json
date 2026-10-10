@@ -65,5 +65,21 @@
  "ocrMode": "모드",
  "modeFast": "빠르게",
  "modeAccurate": "정확하게",
- "modeFastNote": "라이브 텍스트로 빠르게. 표 인식과 언어 고르기는 정확하게에서만."
+ "modeFastNote": "라이브 텍스트로 빠르게. 표 인식과 언어 고르기는 정확하게에서만.",
+ "obIntro": "단축키 한 번으로 화면의 글자를 골라 클립보드에 담아요. 두 가지만 챙기면 바로 쓸 수 있어요.",
+ "obShortcut": "단축키",
+ "obShortcutOK": "언제든 이 조합으로 글자를 주워요. 바꿔도 돼요.",
+ "obShortcutTaken": "{s}를 다른 앱이 쓰고 있어요. TextSniper일 수 있어요. 다른 조합으로 바꿔 주세요.",
+ "obPermission": "화면 기록 권한",
+ "obPermissionOff": "글자를 읽으려면 화면을 볼 수 있어야 해요. 줍줍은 화면을 저장하거나 보내지 않아요.",
+ "obPermissionOn": "켜졌어요. 화면의 글자를 읽을 수 있어요.",
+ "obOn": "켜짐",
+ "obOpenSettings": "시스템 설정 열기",
+ "obRelaunchNote": "권한을 켠 뒤에는 줍줍을 다시 열어야 해요.",
+ "obRelaunch": "다시 열기",
+ "obLater": "나중에",
+ "obClose": "닫기",
+ "obTry": "첫 줍기 해 보기",
+ "conflict": "단축키를 다른 앱이 쓰고 있어요",
+ "conflictSub": "메뉴에서 다른 조합으로 바꿔 주세요"
 }

@@ -65,5 +65,21 @@
  "ocrMode": "模式",
  "modeFast": "快速",
  "modeAccurate": "精确",
- "modeFastNote": "快速使用实况文本。表格和语言选择仅限精确模式。"
+ "modeFastNote": "快速使用实况文本。表格和语言选择仅限精确模式。",
+ "obIntro": "一个快捷键即可选取屏幕文字并放入剪贴板。只需设置两项。",
+ "obShortcut": "快捷键",
+ "obShortcutOK": "随时按此组合拾取文字，也可以更改。",
+ "obShortcutTaken": "{s} 已被其他应用（可能是 TextSniper）占用，请换一个组合。",
+ "obPermission": "屏幕录制",
+ "obPermissionOff": "读取文字需要查看屏幕。Jupjup 不会保存或发送屏幕内容。",
+ "obPermissionOn": "已开启，可以读取屏幕文字。",
+ "obOn": "开",
+ "obOpenSettings": "打开系统设置",
+ "obRelaunchNote": "开启后请重新打开 Jupjup。",
+ "obRelaunch": "重新打开",
+ "obLater": "稍后",
+ "obClose": "关闭",
+ "obTry": "试试第一次拾取",
+ "conflict": "快捷键已被其他应用占用",
+ "conflictSub": "请在菜单中更换组合"
 }

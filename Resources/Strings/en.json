@@ -65,5 +65,21 @@
  "ocrMode": "Mode",
  "modeFast": "Fast",
  "modeAccurate": "Accurate",
- "modeFastNote": "Fast uses Live Text. Tables and language choice need Accurate."
+ "modeFastNote": "Fast uses Live Text. Tables and language choice need Accurate.",
+ "obIntro": "One shortcut picks text off your screen and puts it on the clipboard. Two things to set up and you're ready.",
+ "obShortcut": "Shortcut",
+ "obShortcutOK": "Press this any time to capture text. You can change it.",
+ "obShortcutTaken": "{s} is used by another app, possibly TextSniper. Pick a different combo.",
+ "obPermission": "Screen Recording",
+ "obPermissionOff": "Jupjup needs to see the screen to read text. It never saves or sends what it sees.",
+ "obPermissionOn": "Enabled. Jupjup can read text on screen.",
+ "obOn": "On",
+ "obOpenSettings": "Open System Settings",
+ "obRelaunchNote": "After enabling it, reopen Jupjup.",
+ "obRelaunch": "Reopen",
+ "obLater": "Later",
+ "obClose": "Close",
+ "obTry": "Try your first capture",
+ "conflict": "Shortcut is used by another app",
+ "conflictSub": "Pick a different combo in the menu"
 }

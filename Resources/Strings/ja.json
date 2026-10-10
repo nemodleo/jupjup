@@ -65,5 +65,21 @@
  "ocrMode": "モード",
  "modeFast": "高速",
  "modeAccurate": "高精度",
- "modeFastNote": "高速はLive Textを使用。表と言語の選択は高精度のみ。"
+ "modeFastNote": "高速はLive Textを使用。表と言語の選択は高精度のみ。",
+ "obIntro": "ショートカット一つで画面の文字を選んでクリップボードへ。設定は二つだけです。",
+ "obShortcut": "ショートカット",
+ "obShortcutOK": "いつでもこの組み合わせで文字を拾えます。変更もできます。",
+ "obShortcutTaken": "{s} は他のアプリ（TextSniper など）が使用中です。別の組み合わせにしてください。",
+ "obPermission": "画面収録",
+ "obPermissionOff": "文字を読むには画面を見る必要があります。画面を保存したり送信したりはしません。",
+ "obPermissionOn": "オンです。画面の文字を読み取れます。",
+ "obOn": "オン",
+ "obOpenSettings": "システム設定を開く",
+ "obRelaunchNote": "オンにしたら Jupjup を開き直してください。",
+ "obRelaunch": "開き直す",
+ "obLater": "あとで",
+ "obClose": "閉じる",
+ "obTry": "はじめての読み取り",
+ "conflict": "ショートカットが他のアプリと重複",
+ "conflictSub": "メニューで別の組み合わせに変更してください"
 }

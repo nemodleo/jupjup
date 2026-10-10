@@ -28,7 +28,7 @@ struct ClipboardBackup {
 
 @MainActor
 final class ToastModel: ObservableObject {
-    enum Kind { case working, picked, empty, permission, undone }
+    enum Kind { case working, picked, empty, permission, undone, conflict }
 
     @Published var kind: Kind = .picked
     /// 알림이 새로 뜰 때마다 바뀜 → 낙관 찍기 애니메이션을 다시 돌린다
@@ -121,7 +121,7 @@ final class ToastController {
         panel?.displayIfNeeded()
         switch kind {
         case .working: hideAt = Date().addingTimeInterval(30) // 결과가 오면 바뀜. 혹시 멈추면 30초 뒤 닫음
-        case .permission: hideAt = Date().addingTimeInterval(5)
+        case .permission, .conflict: hideAt = Date().addingTimeInterval(5)
         default: hideAt = Date().addingTimeInterval(2.2)
         }
         startPolling()
@@ -327,6 +327,9 @@ struct ToastView: View {
                 .font(Fonts.font(11)).foregroundStyle(Color.inkFaint).fixedSize(horizontal: false, vertical: true)
         case .undone:
             title(L.s.undone, L.s.undoneSub)
+        case .conflict:
+            title(L.s.conflict, "")
+            Text(L.s.conflictSub).font(Fonts.font(11)).foregroundStyle(Color.inkFaint)
         }
     }
 
