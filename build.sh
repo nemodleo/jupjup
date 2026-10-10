@@ -15,10 +15,14 @@ security find-identity -v -p codesigning 2>/dev/null | grep -q '"Jupjup Dev"' &&
 xcodegen generate --quiet
 xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release -derivedDataPath "$BUILD" \
   JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" \
-  CODE_SIGN_IDENTITY="$IDENTITY" \
   -quiet build
 APP="$BUILD/Build/Products/Release/Jupjup.app"
 pkill -x Jupjup 2>/dev/null && sleep 1 || true
 rm -rf /Applications/Jupjup.app && cp -R "$APP" /Applications/
+# 빌드는 애드혹으로 하고(패키지 타깃까지 인증서를 강요하면 팀이 필요하다며 실패) 설치본만 다시 서명한다.
+# 안쪽 프레임워크부터 같은 인증서로, 권한(entitlements)은 그대로
+if [ "$IDENTITY" != "-" ]; then
+  codesign --force --deep --sign "$IDENTITY" --preserve-metadata=entitlements,flags /Applications/Jupjup.app
+fi
 open /Applications/Jupjup.app
 echo "설치됨: /Applications/Jupjup.app ($(lipo -archs /Applications/Jupjup.app/Contents/MacOS/Jupjup))"
