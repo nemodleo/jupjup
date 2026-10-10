@@ -663,6 +663,22 @@ enum Snapshot {
         let qr = Recognized(lines: [[Piece(rect: .zero, text: qrURL)]], table: nil, codes: [Code(rect: .zero, payload: qrURL, isQR: true)])
         let text = Recognized(lines: [[Piece(rect: .zero, text: "최소제곱법은 잔차의 제곱합을 최소로 만드는 계수를 찾는 방법이다.")],
                                       [Piece(rect: .zero, text: "이때 오차항은 서로 독립이며 평균이 0, 분산이 일정하다고 가정한다.")]], table: nil)
+        // README 영상용: PDF에서 긁은 네 줄(줄 끝 하이픈 포함) → 줍는 중 → 담김 → 한 줄로 잇기. 한국어·영어 알림
+        let pdf = Recognized(lines: ["We propose a method that recovers tables from screen pixels by finding ver-",
+                                     "tical gutters shared by every row. Unlike prior work, it needs no layout model",
+                                     "and runs on-device in under a second. On a benchmark of 8 rendered tables",
+                                     "it reaches 98% cell accuracy."].map { [Piece(rect: .zero, text: $0)] }, table: nil)
+        NSApp.appearance = NSAppearance(named: .darkAqua)
+        for lang in ["ko", "en"] {
+            Settings.shared.language = Lang(rawValue: lang)
+            let d = ToastModel(); d.result = pdf; d.kind = .working
+            save(ToastView(model: d, actions: actions), "\(dir)/demo-\(lang)-working.png")
+            d.kind = .picked
+            save(ToastView(model: d, actions: actions), "\(dir)/demo-\(lang)-picked.png")
+            d.joined = true
+            save(ToastView(model: d, actions: actions), "\(dir)/demo-\(lang)-joined.png")
+        }
+        Settings.shared.language = .auto
         for (name, appearance) in [("light", NSAppearance(named: .aqua)!), ("dark", NSAppearance(named: .darkAqua)!)] {
             NSApp.appearance = appearance
             appearance.performAsCurrentDrawingAppearance {
