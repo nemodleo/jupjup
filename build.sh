@@ -4,8 +4,11 @@ set -e
 cd "$(dirname "$0")"
 BUILD="${TMPDIR:-/tmp}/jupjup-build"; APP=$BUILD/Jupjup.app  # iCloud 폴더 밖에서 빌드 (codesign xattr 문제)
 rm -rf $BUILD && mkdir -p $APP/Contents/MacOS $APP/Contents/Resources
-swiftc -O -swift-version 5 -target arm64-apple-macos14.0 Sources/*.swift -o $APP/Contents/MacOS/Jupjup \
-  -framework AppKit -framework SwiftUI -framework Vision -framework VisionKit -framework ScreenCaptureKit -framework Carbon -framework ServiceManagement
+# 애플 실리콘(arm64)·인텔(x86_64) 둘 다 빌드해 Universal 실행 파일로 합친다
+FW="-framework AppKit -framework SwiftUI -framework Vision -framework VisionKit -framework Carbon -framework ServiceManagement -framework ScreenCaptureKit"
+swiftc -O -swift-version 5 -target arm64-apple-macos14.0  Sources/*.swift -o $BUILD/Jupjup-arm64  ${=FW}
+swiftc -O -swift-version 5 -target x86_64-apple-macos14.0 Sources/*.swift -o $BUILD/Jupjup-x86_64 ${=FW}
+lipo -create $BUILD/Jupjup-arm64 $BUILD/Jupjup-x86_64 -output $APP/Contents/MacOS/Jupjup
 cp -R Resources/Fonts $APP/Contents/Resources/
 cp Resources/AppIcon.icns $APP/Contents/Resources/
 cp -R Resources/Strings $APP/Contents/Resources/    # 화면 문구(언어별 JSON)
