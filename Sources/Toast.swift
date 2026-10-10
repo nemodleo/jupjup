@@ -122,9 +122,16 @@ final class ToastController {
         switch kind {
         case .working: hideAt = Date().addingTimeInterval(30) // 결과가 오면 바뀜. 혹시 멈추면 30초 뒤 닫음
         case .permission, .conflict: hideAt = Date().addingTimeInterval(5)
+        case .picked: hideAt = Date().addingTimeInterval(Self.readTime(result)) // 담은 글 길이만큼 남아 있는다
         default: hideAt = Date().addingTimeInterval(2.2)
         }
         startPolling()
+    }
+
+    /// 담은 글을 훑을 시간: 3초 + 25자마다 1초, 최대 8초. 미리보기는 두 줄이라 150자까지만 센다
+    static func readTime(_ r: Recognized?) -> TimeInterval {
+        let n = min(r?.text.count ?? 0, 150)
+        return min(8, 3 + Double(n) / 25)
     }
 
     private func build() {
@@ -242,7 +249,7 @@ struct ToastView: View {
     @ObservedObject var model: ToastModel
     let actions: Actions
 
-    private var expanded: Bool { model.kind == .picked && (model.hovering || model.editing) }
+    private var expanded: Bool { model.kind == .picked }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -253,7 +260,7 @@ struct ToastView: View {
             }
             if model.kind == .working, let busy = model.busyCPU { busyLine(busy) }
             if model.kind == .picked && model.editing { editor }
-            else if model.kind == .picked && model.hovering { buttons }
+            else if model.kind == .picked { buttons } // 버튼은 늘 보인다. 마우스를 올려야 나오는 기능은 못 찾는다
         }
         .padding(.horizontal, 12)
         .padding(.top, 10)
@@ -275,9 +282,9 @@ struct ToastView: View {
         }
     }
 
-    /// 기본 300. 마우스를 올려 버튼이 나올 때 버튼 글이 길면(독일어 등) 380까지 넓힌다
+    /// 기본 300. 버튼 글이 길면(독일어 등) 380까지 넓힌다
     private var toastWidth: CGFloat {
-        guard model.kind == .picked, model.hovering, !model.editing else { return 300 }
+        guard model.kind == .picked, !model.editing else { return 300 }
         let t = L.s
         var labels = [t.edit, t.undo]
         if model.edited == nil {
@@ -407,8 +414,8 @@ struct ToastView: View {
 /// 고르기 화면의 점선 모서리가 표지 안에서 도는 모습
 struct MarchingFrame: View {
     var body: some View {
-        TimelineView(.animation) { tl in
-            let t = tl.date.timeIntervalSinceReferenceDate
+        TimelineView(.animation(paused: Motion.reduced)) { tl in
+            let t = Motion.reduced ? 0 : tl.date.timeIntervalSinceReferenceDate // 동작 줄이기: 점선이 멈춰 선다
             RoundedRectangle(cornerRadius: 3)
                 // 점선 위치는 무늬 한 주기(5+4=9) 안에서만. 시각을 그대로 쓰면 수십억이 되어
                 // 점선 계산이 메인 스레드를 수십 초 붙잡는다(실측: 인식 중 화면 멈춤의 원인)
@@ -436,7 +443,8 @@ struct StampCheck: View {
         .scaleEffect(landed ? 1 : 1.6)
         .opacity(landed ? 1 : 0)
         .onAppear {
-            withAnimation(.spring(response: 0.28, dampingFraction: 0.5)) { landed = true }
+            if Motion.reduced { landed = true } // 동작 줄이기: 튀지 않고 바로 찍힌다
+            else { withAnimation(.spring(response: 0.28, dampingFraction: 0.5)) { landed = true } }
         }
         .accessibilityLabel(L.s.done)
     }

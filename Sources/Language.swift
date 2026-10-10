@@ -109,7 +109,7 @@ struct LanguagePage: View {
     }
 
     private func header(_ t: String) -> some View {
-        Text(t).font(Fonts.font(10.5)).tracking(1.6).foregroundStyle(Color.inkFaint)
+        Text(t).font(Fonts.font(11)).tracking(1.6).foregroundStyle(Color.inkFaint)
             .padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 3)
     }
 }
@@ -133,11 +133,11 @@ struct ChoiceRow: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(title).font(Fonts.font(12.5)).foregroundStyle(selected ? Color.inkText : Color.inkSub)
                     if let sub {
-                        Text(sub).font(Fonts.font(10.5)).foregroundStyle(Color.inkFaint).fixedSize(horizontal: false, vertical: true)
+                        Text(sub).font(Fonts.font(11)).foregroundStyle(Color.inkFaint).fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 Spacer(minLength: 4)
-                if let trailing { Text(trailing).font(.system(size: 10.5)).foregroundStyle(Color.inkFaint) }
+                if let trailing { Text(trailing).font(.system(size: 11)).foregroundStyle(Color.inkFaint) }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, sub == nil ? 0 : 5)

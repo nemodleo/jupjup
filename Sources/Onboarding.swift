@@ -74,9 +74,9 @@ final class OnboardingController {
         window = w
     }
 
-    /// 권한을 켠 뒤에는 다시 열어야 ScreenCaptureKit이 화면을 준다
+    /// 권한을 켠 뒤에는 다시 열어야 ScreenCaptureKit이 화면을 준다.
+    /// done은 건드리지 않는다: 다시 열리면 안내 창이 "다 됨 · 첫 줍기 해 보기" 상태로 이어진다
     static func relaunch() {
-        Self.done = true
         let p = Process()
         p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
         p.arguments = ["-n", Bundle.main.bundlePath]

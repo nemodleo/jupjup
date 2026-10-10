@@ -47,6 +47,11 @@ extension Color {
 /// 글꼴. 본문(메뉴·미리보기·버튼·숫자)은 시스템 서체, 얼굴(앱 이름·알림 제목·사전 풀이)만 언어별 명조.
 /// 얼굴 — 한국어: 본명조 가늘게(없으면 함렛 가늘게) · 라틴 문자 언어: Cormorant Garamond(없으면 애플 New York)
 /// · 그 밖의 문자(키릴·그리스·아랍·타이·한자 등): 시스템 서체. 한글용 자간은 한국어에만.
+/// 시스템 설정 › 손쉬운 사용 › 디스플레이 › "동작 줄이기"를 따른다: 도는 점선·튀는 도장·들썩이는 줄을 멈춘다
+enum Motion {
+    static var reduced: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
+}
+
 enum Fonts {
     /// Resources/Fonts 안의 글꼴 파일을 모두 앱 안에서만 쓰도록 등록
     static func register() {
@@ -265,10 +270,10 @@ struct AppMarkView: View {
     var size: CGFloat = 24
 
     var body: some View {
-        TimelineView(.animation(paused: state != .working)) { tl in
+        TimelineView(.animation(paused: state != .working || Motion.reduced)) { tl in
             Canvas { gc, sz in
                 let t = tl.date.timeIntervalSinceReferenceDate
-                let phase = state == .working ? CGFloat((sin(t * 2 * .pi / 1.2) + 1) / 2) : 0
+                let phase = state == .working && !Motion.reduced ? CGFloat((sin(t * 2 * .pi / 1.2) + 1) / 2) : 0
                 gc.withCGContext { AppMark.draw(in: $0, rect: CGRect(origin: .zero, size: sz), state: state, phase: phase, yDown: true) }
             }
         }

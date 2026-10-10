@@ -438,7 +438,7 @@ struct MenuView: View {
                 .disabled(settings.fastMode)
             modeRow
             if settings.fastMode {
-                Text(L.s.modeFastNote).font(.system(size: 10.5)).foregroundStyle(Color.inkFaint)
+                Text(L.s.modeFastNote).font(.system(size: 11)).foregroundStyle(Color.inkFaint)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 8).padding(.bottom, 4)
             }
