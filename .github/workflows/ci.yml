@@ -1,0 +1,38 @@
+# 올릴 때마다: Universal 빌드 → 표 채점 · 12개 언어 인식 · 화면 멈춤 측정(tools/run_tests.sh)
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Xcode 버전
+        run: xcodebuild -version
+
+      - name: XcodeGen
+        run: brew install xcodegen
+
+      - name: 빌드 (Universal, 리포트 키 없음)
+        run: |
+          xcodegen generate --quiet
+          xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release \
+            -derivedDataPath build/dd -quiet build
+          lipo -archs build/dd/Build/Products/Release/Jupjup.app/Contents/MacOS/Jupjup
+
+      - name: 시험 (표 · 언어 · 멈춤)
+        run: tools/run_tests.sh build/dd/Build/Products/Release/Jupjup.app
+
+      - name: 표 채점 그림 보관
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: table-bench-images
+          path: ${{ runner.temp }}/jupjup-tests/img
+          if-no-files-found: ignore

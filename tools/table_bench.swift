@@ -36,7 +36,12 @@ final class Runner: NSObject, WKNavigationDelegate {
     var total = 0, right = 0
     override init() { super.init(); web.navigationDelegate = self }
     func next() {
-        guard i < cases.count else { print(String(format: "\n전체 칸 정확도 %d/%d (%.0f%%)", right, total, Double(right) * 100 / Double(max(total, 1)))); exit(0) }
+        guard i < cases.count else {
+            let pct = Double(right) * 100 / Double(max(total, 1))
+            let threshold = Double(CommandLine.arguments.dropFirst(2).first ?? "95") ?? 95
+            print(String(format: "\n전체 칸 정확도 %d/%d (%.0f%%) · 기준 %.0f%%", right, total, pct, threshold))
+            exit(pct < threshold ? 1 : 0) // 기준 아래면 실패(CI)
+        }
         web.loadHTMLString(cases[i].html, baseURL: nil)
     }
     func webView(_ w: WKWebView, didFinish _: WKNavigation!) {
