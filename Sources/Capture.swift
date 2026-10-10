@@ -19,6 +19,16 @@ final class CaptureController {
 
     var isActive: Bool { window != nil || starting }
 
+    /// 열리자마자 방금 그 자리를 다시 담을지(알림의 "같은 자리 다시")
+    private var pendingLast = false
+
+    /// 방금 그 자리를 다시 찍는다. 기억한 자리가 없으면 그냥 고르기 화면이 열린다
+    func repeatLast() {
+        if let w = window { w.overlay.useLast(); return }
+        pendingLast = last != nil
+        start()
+    }
+
     /// returnTo: 다 고르면 앞으로 돌려줄 앱(메뉴에서 시작했을 때 메뉴 전 앱). 없으면 지금 앞에 있는 앱
     func start(returnTo: NSRunningApplication? = nil) {
         if let w = window { w.overlay.useLast(); return } // 고르는 중 단축키 다시 → 방금 그 자리
@@ -85,6 +95,7 @@ final class CaptureController {
         NSApp.activate(ignoringOtherApps: true)
         w.makeKeyAndOrderFront(nil)
         w.makeFirstResponder(v)
+        if pendingLast { pendingLast = false; v.useLast() }
     }
 
     private func finish(rect: CGRect, id: CGDirectDisplayID) {

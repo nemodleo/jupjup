@@ -88,6 +88,7 @@ struct Strings {
     var moreRows: (Int) -> String
     var asText, asTable, keepLines, joinOne, edit, undo, cancel, save, done: String
     var qr, barcode, open: String
+    var sectionPick, sectionApp, search, recent, retryAccurate, sameSpotAgain: String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
     var escCancel: String
@@ -127,6 +128,8 @@ struct Strings {
         asText = v("asText"); asTable = v("asTable"); keepLines = v("keepLines"); joinOne = v("joinOne")
         edit = v("edit"); undo = v("undo"); cancel = v("cancel"); save = v("save"); done = v("done")
         qr = v("qr"); barcode = v("barcode"); open = v("open")
+        sectionPick = v("sectionPick"); sectionApp = v("sectionApp"); search = v("search"); recent = v("recent")
+        retryAccurate = v("retryAccurate"); sameSpotAgain = v("sameSpotAgain")
         pickWindow = v("pickWindow"); spaceDrag = v("spaceDrag"); dragSelect = v("dragSelect"); spaceWindow = v("spaceWindow")
         sameSpot = { fill("sameSpot", ["s": $0]) }
         escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = v("aboutBody")

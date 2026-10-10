@@ -109,7 +109,7 @@ struct LanguagePage: View {
     }
 
     private func header(_ t: String) -> some View {
-        Text(t).font(Fonts.font(11)).tracking(1.6).foregroundStyle(Color.inkFaint)
+        Text(t).font(Fonts.font(11)).tracking(settings.language.isRTL ? 0 : 1.6).foregroundStyle(Color.inkFaint)
             .padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 3)
     }
 }
@@ -175,13 +175,34 @@ struct ChoiceRow: View {
     }
 }
 
-/// 화면 글자 목록: 자동 + 가지고 있는 언어 전부(각 언어 이름). 목록만 스크롤
+/// 화면 글자 목록: 검색 칸 · 자동 · 최근 · 가지고 있는 언어 전부(각 언어 이름). 목록만 스크롤 — 캔버스 10번 D
 struct UILanguagePage: View {
     @ObservedObject var settings: Settings
     let back: () -> Void
+    @State private var query = ""
+
+    /// 원어 이름·지금 화면 언어로 된 이름·코드 어디에 맞아도 찾는다
+    private func matches(_ l: Lang) -> Bool {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        if q.isEmpty { return true }
+        let local = Locale.current.localizedString(forIdentifier: l.rawValue) ?? ""
+        return [l.endonym, local, l.rawValue].contains { $0.localizedCaseInsensitiveContains(q) }
+    }
+
+    private var recent: [Lang] { settings.recentLanguages.map(Lang.init(rawValue:)).filter { Lang.concrete.contains($0) } }
+
+    private func header(_ t: String) -> some View {
+        Text(t).font(Fonts.font(10)).tracking(settings.language.isRTL ? 0 : 1.6).foregroundStyle(Color.inkFaint)
+            .padding(.horizontal, 8).padding(.top, 6).padding(.bottom, 2)
+    }
+
+    private func row(_ l: Lang) -> some View {
+        ChoiceRow(mark: .radio(settings.language == l), title: l.endonym, selected: settings.language == l, height: 24) { settings.language = l }
+    }
 
     var body: some View {
         let t = L.s
+        let searching = !query.trimmingCharacters(in: .whitespaces).isEmpty
         VStack(alignment: .leading, spacing: 1) {
             Button(action: back) {
                 HStack(spacing: 8) {
@@ -194,21 +215,38 @@ struct UILanguagePage: View {
             .buttonStyle(.plain)
             .accessibilityLabel(t.back)
 
-            Rectangle().fill(Color.inkRule).frame(height: 1).padding(.horizontal, 8).padding(.vertical, 4)
-            ChoiceRow(mark: .radio(settings.language == .auto), title: t.auto, sub: t.nowSystem(Lang.auto.endonym),
-                      selected: settings.language == .auto) { settings.language = .auto }
-            Rectangle().fill(Color.inkRule).frame(height: 1).padding(.horizontal, 8).padding(.vertical, 4)
+            // 검색 칸: 치는 즉시 거른다
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass").font(.system(size: 10, weight: .semibold)).foregroundStyle(Color.inkFaint)
+                TextField("\(t.search) · \(Lang.concrete.count)", text: $query)
+                    .textFieldStyle(.plain).font(.system(size: 11.5)).foregroundStyle(Color.inkText)
+                if searching {
+                    Button { query = "" } label: {
+                        Image(systemName: "xmark.circle.fill").font(.system(size: 10)).foregroundStyle(Color.inkFaint)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 8).frame(height: 24)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.inkFill))
+            .padding(.horizontal, 8).padding(.vertical, 4)
+
+            if !searching {
+                ChoiceRow(mark: .radio(settings.language == .auto), title: t.auto, sub: t.nowSystem(Lang.auto.endonym),
+                          selected: settings.language == .auto) { settings.language = .auto }
+                if !recent.isEmpty {
+                    header(t.recent)
+                    ForEach(recent, id: \.self) { row($0) }
+                }
+                Rectangle().fill(Color.inkRule).frame(height: 1).padding(.horizontal, 8).padding(.vertical, 4)
+            }
             ScrollViewReader { proxy in
                 ScrollView(.vertical) {
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(Lang.concrete, id: \.self) { l in
-                            ChoiceRow(mark: .radio(settings.language == l), title: l.endonym,
-                                      selected: settings.language == l, height: 24) { settings.language = l }
-                                .id(l)
-                        }
+                        ForEach(Lang.concrete.filter(matches), id: \.self) { l in row(l).id(l) }
                     }
                 }
-                .frame(height: 400)
+                .frame(height: searching ? 200 : 360)
                 .onAppear { if settings.language != .auto { proxy.scrollTo(settings.language, anchor: .center) } }
             }
         }

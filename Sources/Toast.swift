@@ -107,6 +107,9 @@ final class ToastController {
     private var poll: Timer?
     private var hideAt: Date?
     private var anchor: NSPoint = .zero
+    private var keyMonitor: Any?
+    var onRetryAccurate: (() -> Void)?
+    var onSameSpot: (() -> Void)?
 
     func show(_ kind: ToastModel.Kind, result: Recognized? = nil, backup: ClipboardBackup? = nil, busyCPU: Int? = nil) {
         let m = model
@@ -138,7 +141,7 @@ final class ToastController {
         panel?.displayIfNeeded()
         switch kind {
         case .working: hideAt = Date().addingTimeInterval(30) // 결과가 오면 바뀜. 혹시 멈추면 30초 뒤 닫음
-        case .permission, .conflict: hideAt = Date().addingTimeInterval(5)
+        case .permission, .conflict, .empty: hideAt = Date().addingTimeInterval(5)
         case .picked: hideAt = Date().addingTimeInterval(Self.readTime(result)) // 담은 글 길이만큼 남아 있는다
         default: hideAt = Date().addingTimeInterval(2.2)
         }
@@ -159,7 +162,7 @@ final class ToastController {
         p.hasShadow = false
         p.hidesOnDeactivate = false
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        let view = ToastView(model: model, actions: .init(
+        let acts = ToastView.Actions(
             toggleTable: { [weak self] in self?.update { $0.asTable.toggle(); Reporting.signal("toast.table", ["to": $0.asTable ? "table" : "text"]) } },
             toggleJoin: { [weak self] in self?.update { $0.joined.toggle(); Reporting.signal("toast.join", ["to": $0.joined ? "one" : "lines"]) } },
             edit: { [weak self] in self?.beginEdit() },
@@ -171,8 +174,24 @@ final class ToastController {
                 NSWorkspace.shared.open(u)
                 Reporting.signal("toast.open", ["scheme": u.scheme ?? ""])
                 self.hide()
+            },
+            retryAccurate: { [weak self] in self?.onRetryAccurate?() },
+            sameSpot: { [weak self] in self?.hide(); self?.onSameSpot?() }
+        )
+        let view = ToastView(model: model, actions: acts)
+        // 알림을 눌러(또는 글을 긁어) 키 윈도우가 된 동안 ⌘J 한 줄 · ⌘E 고치기 · ⌘Z 되돌리기 · ⌘O 열기 — 캔버스 10번 C
+        keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
+            guard let self, let p = self.panel, p.isKeyWindow, self.model.kind == .picked, !self.model.editing,
+                  e.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command else { return e }
+            switch e.charactersIgnoringModifiers {
+            case "j": acts.toggleJoin()
+            case "e": acts.edit()
+            case "z": acts.undo()
+            case "o" where self.model.link != nil: acts.open()
+            default: return e
             }
-        ))
+            return nil
+        }
         let h = NSHostingView(rootView: view)
         p.contentView = h
         hosting = h
@@ -269,12 +288,14 @@ struct ToastView: View {
         var cancelEdit: () -> Void
         var undo: () -> Void
         var open: () -> Void
+        var retryAccurate: () -> Void
+        var sameSpot: () -> Void
     }
 
     @ObservedObject var model: ToastModel
     let actions: Actions
 
-    private var expanded: Bool { model.kind == .picked }
+    private var expanded: Bool { model.kind == .picked || model.kind == .empty }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -286,6 +307,7 @@ struct ToastView: View {
             if model.kind == .working, let busy = model.busyCPU { busyLine(busy) }
             if model.kind == .picked && model.editing { editor }
             else if model.kind == .picked { buttons } // 버튼은 늘 보인다. 마우스를 올려야 나오는 기능은 못 찾는다
+            else if model.kind == .empty { emptyButtons }
         }
         .padding(.horizontal, 12)
         .padding(.top, 10)
@@ -309,8 +331,12 @@ struct ToastView: View {
 
     /// 기본 300. 버튼 글이 길면(독일어 등) 380까지 넓힌다
     private var toastWidth: CGFloat {
-        guard model.kind == .picked, !model.editing else { return 300 }
         let t = L.s
+        if model.kind == .empty {
+            let labels = (Settings.shared.fastMode ? [t.retryAccurate] : []) + [t.sameSpotAgain]
+            return min(380, max(300, labels.reduce(0) { $0 + textWidth($1, 12, .medium) + 18 } + 32))
+        }
+        guard model.kind == .picked, !model.editing else { return 300 }
         var labels = [t.edit, t.undo]
         if model.link != nil { labels.append(t.open) }
         if model.edited == nil {
@@ -357,7 +383,8 @@ struct ToastView: View {
         case .working:
             title(L.s.working, L.s.workingSub)
         case .empty:
-            title(L.s.empty, L.s.emptySub)
+            title(L.s.empty, "")
+            Text(L.s.emptySub).font(Fonts.font(11)).foregroundStyle(Color.inkFaint).fixedSize(horizontal: false, vertical: true)
         case .permission:
             title(L.s.permission, "")
             Text(L.s.permissionSub)
@@ -415,10 +442,21 @@ struct ToastView: View {
                     ToastButton(title: model.joined ? L.s.keepLines : L.s.joinOne, action: actions.toggleJoin)
                 }
             }
-            ToastButton(title: L.s.edit, action: actions.edit)
-            ToastButton(title: L.s.undo, strong: model.link == nil, action: actions.undo)
+            ToastButton(title: L.s.edit, action: actions.edit).help("⌘E")
+            ToastButton(title: L.s.undo, strong: model.link == nil, action: actions.undo).help("⌘Z")
             // QR의 링크·메일·전화면 바로 열기. 이때는 열기가 주 동작
-            if model.link != nil { ToastButton(title: L.s.open, strong: true, action: actions.open) }
+            if model.link != nil { ToastButton(title: L.s.open, strong: true, action: actions.open).help("⌘O") }
+        }
+        .padding(.top, 6)
+        .overlay(alignment: .top) { Rectangle().fill(Color.inkRule).frame(height: 1) }
+    }
+
+    /// 못 읽었을 때: (빠르게였으면) 정확하게로 다시 · 같은 자리 다시
+    private var emptyButtons: some View {
+        HStack(spacing: 2) {
+            Spacer()
+            if Settings.shared.fastMode { ToastButton(title: L.s.retryAccurate, action: actions.retryAccurate) }
+            ToastButton(title: L.s.sameSpotAgain, strong: true, action: actions.sameSpot)
         }
         .padding(.top, 6)
         .overlay(alignment: .top) { Rectangle().fill(Color.inkRule).frame(height: 1) }

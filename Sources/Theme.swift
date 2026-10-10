@@ -165,7 +165,12 @@ final class Settings: ObservableObject {
         didSet {
             d.set(language.rawValue, forKey: "language")
             Reporting.signal("language.changed", ["language": language.resolved.rawValue])
+            if language != .auto { recentLanguages = ([language.rawValue] + recentLanguages.filter { $0 != language.rawValue }).prefix(3).map { $0 } }
         }
+    }
+    /// 화면 글자 목록의 "최근" 묶음: 직접 고른 언어 최대 3개, 최근 것이 앞
+    @Published var recentLanguages: [String] = UserDefaults.standard.stringArray(forKey: "recentLanguages") ?? [] {
+        didSet { d.set(recentLanguages, forKey: "recentLanguages") }
     }
     /// 읽을 글자: 직접 고르기 / 고른 Vision 코드(목록 순서) / 못 읽으면 다른 글자도
     @Published var ocrManual: Bool { didSet { d.set(ocrManual, forKey: "ocrManual") } }

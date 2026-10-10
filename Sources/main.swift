@@ -24,6 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var captureStart = Date()
     private let onboarding = OnboardingController()
     private let aboutWindow = AboutController()
+    /// 마지막으로 고른 그림과 자리. 못 읽었을 때 "정확하게로 다시"에 쓴다
+    private var lastPicked: (CGImage, CGRect)?
 
     func applicationDidFinishLaunching(_ note: Notification) {
         Fonts.register()
@@ -48,9 +50,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let self else { return }
             // 인식을 시작하기 전에 '줍는 중'부터 그린다. 맥이 바쁘면 경고도 함께
             self.captureStart = Date()
+            self.lastPicked = (image, rect)
             self.marker.show(rect)
             self.toast.show(.working, busyCPU: self.cpu.busyPercent())
             self.recognize(image)
+        }
+        // 못 읽었을 때의 두 버튼(캔버스 10번 E): 같은 그림을 정확하게로 다시 / 같은 자리를 다시 찍기
+        toast.onRetryAccurate = { [weak self] in
+            guard let self, let (image, rect) = self.lastPicked else { return }
+            Settings.shared.fastMode = false
+            Reporting.signal("toast.retryAccurate")
+            self.captureStart = Date()
+            self.marker.show(rect)
+            self.toast.show(.working, busyCPU: self.cpu.busyPercent())
+            self.recognize(image)
+        }
+        toast.onSameSpot = { [weak self] in
+            Reporting.signal("toast.sameSpot")
+            self?.setGlyph(.picking)
+            self?.capture.repeatLast()
         }
         capture.onCancel = { [weak self] in self?.setGlyph(.idle); Reporting.signal("capture.cancelled") }
         capture.onError = { [weak self] _ in
@@ -417,7 +435,7 @@ struct MenuView: View {
         let caps = CGFloat(settings.shortcut.caps.count) * 20
         let lang = settings.language == .auto ? "\(t.auto) · \(Lang.auto.endonym)" : settings.language.endonym
         let rows: [CGFloat] = [
-            textWidth(t.pick, 13, .medium) + 16 + caps + 16,
+            textWidth(t.pick, 13, .medium) + 16 + textWidth(t.change, 10.5) + 6 + caps + 16,
             textWidth(t.openAtLogin, 12.5) + 8 + 36 + 18,
             textWidth(t.joinLines, 12.5) + 8 + 36 + 18,
             textWidth(t.tables, 12.5) + 8 + 36 + 18,
@@ -463,11 +481,8 @@ struct MenuView: View {
                     .padding(.horizontal, 8).padding(.top, 3)
             }
 
-            rule
-            toggle(L.s.openAtLogin, isOn: Binding(get: { login }, set: { on in
-                try? on ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
-                login = SMAppService.mainApp.status == .enabled
-            }))
+            // 줍기(줄바꿈·표·모드·언어)와 앱(함께 열기·통계) 두 묶음 — 캔버스 10번 A
+            section(L.s.sectionPick)
             toggle(L.s.joinLines, isOn: $settings.joinLines)
             toggle(L.s.tables, isOn: $settings.tables)
                 .opacity(settings.fastMode ? 0.45 : 1)
@@ -478,6 +493,11 @@ struct MenuView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 8).padding(.bottom, 4)
             languageRow
+            section(L.s.sectionApp)
+            toggle(L.s.openAtLogin, isOn: Binding(get: { login }, set: { on in
+                try? on ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
+                login = SMAppService.mainApp.status == .enabled
+            }))
             toggle(L.s.reports, isOn: $settings.reports)
             rule
             MenuRow(title: L.s.about, action: actions.about)
@@ -523,6 +543,13 @@ struct MenuView: View {
 
     private var rule: some View {
         Rectangle().fill(Color.inkRule).frame(height: 1).padding(.horizontal, 8).padding(.vertical, 4)
+    }
+
+    /// 묶음 머리: 옅은 작은 글자, 자간 넓게
+    private func section(_ t: String) -> some View {
+        // 아랍어·히브리어처럼 이어 쓰는 글자는 자간을 띄우면 모양이 깨진다
+        Text(t).font(Fonts.font(10)).tracking(settings.language.isRTL ? 0 : 1.6).foregroundStyle(Color.inkFaint)
+            .padding(.horizontal, 8).padding(.top, 8).padding(.bottom, 2)
     }
 
     private func toggle(_ title: String, isOn: Binding<Bool>) -> some View {
@@ -575,15 +602,20 @@ struct ShortcutButton: View {
                     Text(L.s.pressKeys).font(Fonts.font(11, .medium)).foregroundStyle(Color.seal)
                         .padding(.horizontal, 6).frame(height: 18)
                         .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.seal, lineWidth: 1))
-                } else if over || rowHover {
-                    // 줄에만 올리면 옅게, "바꾸기" 위에 올리면 진하게(누를 수 있다는 표시)
-                    Text(L.s.change).font(Fonts.font(11, over ? .medium : .regular)).foregroundStyle(over ? Color.inkText : Color.inkSub)
+                } else if over {
+                    // "바꾸기" 위에 올리면 진하게(누를 수 있다는 표시)
+                    Text(L.s.change).font(Fonts.font(11, .medium)).foregroundStyle(Color.inkText)
                         .padding(.horizontal, 6).frame(height: 18)
-                        .background(RoundedRectangle(cornerRadius: 4).fill(over ? Color.inkFill : .clear))
-                        .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(over ? Color.inkSub.opacity(0.6) : Color.inkFaint.opacity(0.5)))
+                        .background(RoundedRectangle(cornerRadius: 4).fill(Color.inkFill))
+                        .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.inkSub.opacity(0.6)))
                 } else {
-                    HStack(spacing: 3) { ForEach(Array(settings.shortcut.caps.enumerated()), id: \.offset) { KeyCap($0.element) } }
-                        .environment(\.layoutDirection, .leftToRight)
+                    // 평소에도 "바꾸기"가 옅게 보인다 — 마우스를 올려야 아는 기능은 못 찾는다(평가 지적)
+                    HStack(spacing: 6) {
+                        Text(L.s.change).font(Fonts.font(10.5)).foregroundStyle(rowHover ? Color.inkSub : Color.inkFaint)
+                        HStack(spacing: 3) { ForEach(Array(settings.shortcut.caps.enumerated()), id: \.offset) { KeyCap($0.element) } }
+                            .environment(\.layoutDirection, .leftToRight)
+                    }
+                    .fixedSize() // 줄이 좁아도 캡 글자가 눌리지 않게
                 }
             }
             .padding(.horizontal, 8)
@@ -654,11 +686,12 @@ struct MenuRow: View {
 @MainActor
 enum Snapshot {
     static func render(to dir: String) {
+        let keepRecent = Settings.shared.recentLanguages
         let sample = Recognizer.recognize(sampleImage())
         let toast = ToastModel()
         toast.result = sample
         toast.asTable = sample.table != nil
-        let actions = ToastView.Actions(toggleTable: {}, toggleJoin: {}, edit: {}, commitEdit: {}, cancelEdit: {}, undo: {}, open: {})
+        let actions = ToastView.Actions(toggleTable: {}, toggleJoin: {}, edit: {}, commitEdit: {}, cancelEdit: {}, undo: {}, open: {}, retryAccurate: {}, sameSpot: {})
         let qrURL = "https://github.com/nemodleo/jupjup"
         let qr = Recognized(lines: [[Piece(rect: .zero, text: qrURL)]], table: nil, codes: [Code(rect: .zero, payload: qrURL, isQR: true)])
         let text = Recognized(lines: [[Piece(rect: .zero, text: "최소제곱법은 잔차의 제곱합을 최소로 만드는 계수를 찾는 방법이다.")],
@@ -716,6 +749,7 @@ enum Snapshot {
         Settings.shared.fastMode = true
         save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-fast.png")
         Settings.shared.fastMode = keepFast
+        Settings.shared.recentLanguages = keepRecent // 언어를 돌려 가며 그린 흔적이 사용자의 "최근"에 남지 않게
         save(AboutView(), "\(dir)/about.png")
         Settings.shared.language = Lang(rawValue: "en")
         save(AboutView(), "\(dir)/about-en.png")
