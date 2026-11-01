@@ -74,14 +74,14 @@ Jupjup is in **beta** and not yet notarized by Apple, so macOS will warn on firs
 brew install xcodegen          # once
 git clone https://github.com/nemodleo/jupjup.git
 cd jupjup
-./build.sh                     # builds a Universal app, installs to /Applications, opens it
+make build                     # builds a Universal app, installs to /Applications, opens it
 ```
 
 Requires Xcode (tested with 26.3). The first build downloads two Swift packages and takes a few minutes.
 
-> If you rebuild often, run `tools/make_cert.sh` once. It creates a self-signed certificate ("Jupjup Dev") that `build.sh` then signs with, so macOS keeps the Screen Recording permission across rebuilds. Ad-hoc signatures change on every build, which makes macOS ask again each time.
+> If you rebuild often, run `make cert` once. It creates a self-signed certificate ("Jupjup Dev") that `build.sh` then signs with, so macOS keeps the Screen Recording permission across rebuilds. Ad-hoc signatures change on every build, which makes macOS ask again each time.
 
-**Download** — get the DMG from [jupjup.d-t-it.com](https://jupjup.d-t-it.com) (Universal, about 5 MB). It isn’t notarized yet: on first launch, open System Settings › Privacy & Security and click *Open Anyway*. The disk image includes the steps. Make your own with `tools/make_dmg.sh`.
+**Download** — get the DMG from [jupjup.d-t-it.com](https://jupjup.d-t-it.com) (Universal, about 5 MB). It isn’t notarized yet: on first launch, open System Settings › Privacy & Security and click *Open Anyway*. The disk image includes the steps. Make your own with `make dmg`.
 
 ### First launch
 
