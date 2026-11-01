@@ -1,16 +1,17 @@
 # Privacy Policy · 개인정보 처리방침
 
-*Last updated: 2026-11-01 · [한국어](#한국어)*
+*Last updated: 2026-11-02 · [한국어](#한국어)*
 
 ## In one sentence
 
-Jupjup reads text on your screen **on your Mac** and never saves, uploads or logs what it reads. The only thing that can leave your Mac is an optional, anonymous count of how the app is used and whether it crashed — and you can turn that off with one click.
+Jupjup reads text on your screen **on your Mac** and never uploads or logs what it reads. The only copy it keeps is a short local history on your Mac, which you can turn off. The only thing that can leave your Mac is an optional, anonymous count of how the app is used and whether it crashed — and you can turn that off with one click.
 
 ## What Jupjup does with your screen
 
 - When you press the shortcut, Jupjup takes a picture of the screen you selected, recognizes the text with Apple's on-device Vision or Live Text engines, and puts the text on your clipboard.
 - The picture exists in memory only for that one capture and is discarded afterwards. It is never written to disk, never uploaded, never logged.
 - The recognized text goes to your clipboard and nowhere else. The *Undo* button keeps a copy of your *previous* clipboard in memory until the notification closes, so it can be restored.
+- **History**: the last 20 texts you copied with Jupjup are saved on your Mac only, in `~/Library/Application Support/Jupjup/history.json` (readable by your user account only), so you can copy them again from the menu. Never images, never uploaded. Turn off *Keep History* in the History page to stop saving and delete what is there; *Clear History* deletes it any time.
 - Jupjup has no account and no server of its own. It uses the network for two things only: the optional reports described below, and the update check.
 
 ## Update check
@@ -82,13 +83,14 @@ Open an issue at [github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup
 
 ## 한 문장으로
 
-줍줍은 화면의 글자를 **맥 안에서** 읽고, 읽은 내용을 저장하거나 올리거나 기록하지 않아요. 맥 밖으로 나갈 수 있는 건 "앱을 어떻게 썼는지, 죽었는지"의 익명 횟수뿐이고, 그것도 한 번의 클릭으로 끌 수 있어요.
+줍줍은 화면의 글자를 **맥 안에서** 읽고, 읽은 내용을 올리거나 로그로 남기지 않아요. 남는 건 이 맥 안의 짧은 복사 기록뿐이고, 그것도 끌 수 있어요. 맥 밖으로 나갈 수 있는 건 "앱을 어떻게 썼는지, 죽었는지"의 익명 횟수뿐이고, 그것도 한 번의 클릭으로 끌 수 있어요.
 
 ## 화면을 어떻게 다루나요
 
 - 단축키를 누르면 줍줍이 고른 영역의 화면 이미지를 찍고, 애플의 기기 안 인식 엔진(Vision 또는 라이브 텍스트)으로 글자를 읽어 클립보드에 담아요.
 - 이미지는 그 한 번의 캡쳐 동안만 메모리에 있다가 버려져요. 디스크에 쓰지 않고, 올리지 않고, 기록하지 않아요.
 - 읽은 글자는 클립보드로만 가요. *되돌리기* 버튼을 위해 **줍기 전** 클립보드 내용을 알림이 닫힐 때까지 메모리에 잠깐 들고 있어요.
+- **복사 기록**: 줍줍으로 담은 글 최근 20개를 이 맥에만 저장해요(`~/Library/Application Support/Jupjup/history.json`, 내 계정만 읽기). 메뉴에서 다시 담을 수 있게 하려는 거예요. 이미지는 저장하지 않고, 어디로도 보내지 않아요. 기록 화면의 *기록 남기기*를 끄면 저장을 멈추고 있던 기록도 지워요. *기록 모두 지우기*로 언제든 지울 수 있어요.
 - 줍줍에는 계정도 자체 서버도 없어요. 네트워크는 두 가지에만 써요: 아래 선택적 리포트, 그리고 새 버전 확인.
 
 ## 새 버전 확인

@@ -55,6 +55,7 @@ Everything runs on your Mac. No account, no server, nothing leaves the machine u
 | **Whole window** | Press **Space** while selecting to pick a window instead |
 | **Same spot again** | Press the shortcut again while selecting to reuse the last area |
 | **Fix it before you paste** | Buttons right in the notification: join lines (⌘J), edit (⌘E), or **Undo** (⌘Z, restores your previous clipboard). Drag over the preview to copy just part of it |
+| **History** | The last 20 copies, on your Mac only. Pick one in the menu to copy it again, in the same shape (one line, table, edited) |
 | **35 interface languages** | Auto-follows macOS; right-to-left layout for Arabic and Hebrew |
 | **Busy-Mac warning** | Tells you when a heavy CPU load will slow reading down |
 
@@ -112,7 +113,7 @@ Requires Xcode (tested with 26.3). The first build downloads two Swift packages 
 
 ## Privacy
 
-Jupjup never saves, uploads or logs what it reads. Screenshots live in memory for the duration of one capture.
+Jupjup never uploads or logs what it reads. Screenshots live in memory for the duration of one capture. The only thing kept is the local history of your last 20 copies (turn off with *Keep History*).
 
 Full policy: [PRIVACY.md](PRIVACY.md).
 
@@ -130,7 +131,7 @@ Once a day Jupjup also checks `jupjup.d-t-it.com/version.json` for a newer versi
 - [ ] Developer ID signing and notarization (no more Gatekeeper warning)
 - [ ] Downloadable releases and in-app updates
 - [ ] Native-speaker review of the 31 machine-translated interface languages
-- [ ] Capture history
+- [x] Capture history
 - [ ] Mac App Store
 
 ## Contributing
