@@ -79,7 +79,7 @@ Xcode가 필요해요(26.3에서 확인). 첫 빌드는 Swift 패키지 두 개�
 
 > 자주 빌드한다면 `tools/make_cert.sh`를 한 번 실행해 두세요. 자체 서명 인증서("Jupjup Dev")를 만들어 `build.sh`가 그걸로 서명하게 되고, 그러면 다시 빌드해도 화면 기록 권한이 풀리지 않아요. 애드혹 서명은 빌드마다 바뀌어서 macOS가 권한을 매번 되물어요.
 
-**내려받기** — [jupjup.d-t-it.com](https://jupjup.d-t-it.com/ko/)에서 DMG를 받으세요(Universal, 4.6MB). 아직 공증 전이라 처음 열 때 시스템 설정 › 개인정보 보호 및 보안에서 *그래도 열기*를 눌러야 해요. 디스크 이미지 안에 방법이 적혀 있어요. 직접 만들려면 `tools/make_dmg.sh`.
+**내려받기** — [jupjup.d-t-it.com](https://jupjup.d-t-it.com/ko/)에서 DMG를 받으세요(Universal, 약 5MB). 아직 공증 전이라 처음 열 때 시스템 설정 › 개인정보 보호 및 보안에서 *그래도 열기*를 눌러야 해요. 디스크 이미지 안에 방법이 적혀 있어요. 직접 만들려면 `tools/make_dmg.sh`.
 
 ### 처음 켤 때
 
