@@ -5,6 +5,7 @@ name: notify-site
 on:
   release:
     types: [published]
+  workflow_dispatch: # 연결 시험용
 jobs:
   dispatch:
     runs-on: ubuntu-latest
