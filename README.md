@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/hero.png" width="760" alt="Jupjup menu and a copied table">
+  <a href="https://jupjup.d-t-it.com/"><img src="docs/images/demo.gif" width="760" alt="Selecting a paragraph in a paused lecture video with ⇧⌘2 and pasting it into Notes"></a>
 </p>
 
 ## Why Jupjup?
@@ -32,7 +32,15 @@ There are plenty of screen-OCR tools. Jupjup does three things they don't:
 
 - **Tables stay tables.** Select a table on screen and paste it into Numbers, Excel or Google Sheets with the cells intact. Jupjup puts both tab-separated text and an HTML table on the clipboard. 98% cell accuracy on our HTML-table benchmark (`tools/table_bench.swift`).
 - **Reads any script without setup.** Korean, Japanese, Chinese, Cyrillic, Thai, Arabic, Vietnamese… Jupjup reads in your languages first and, if that fails, tries the other scripts automatically. 97–100% on 12 languages in our tests.
-- **Shows you what's happening, where you're looking.** A vermilion bracket stays on the area you selected, sweeps while reading, and stamps a seal when done. The notification in the corner does the same.
+- **QR codes and barcodes, too.** Even styled ones (dotted, rounded, logo on top). If it is a link, the notification has an **Open** button. 46 of 47 hard cases in `tools/code_bench.swift`.
+
+<table>
+  <tr>
+    <td width="33%" align="center"><img src="docs/images/table.jpg" alt="A table in a screenshot → Numbers"><br><sub>A table in a screenshot → Numbers</sub></td>
+    <td width="33%" align="center"><img src="docs/images/script.jpg" alt="Four scripts on one sign"><br><sub>Four scripts on one sign</sub></td>
+    <td width="33%" align="center"><img src="docs/images/qr.jpg" alt="A QR code on a poster → Open"><br><sub>A QR code on a poster → Open</sub></td>
+  </tr>
+</table>
 
 Everything runs on your Mac. No account, no server, nothing leaves the machine unless you keep the optional, counts-only crash/usage reports on.
 
@@ -46,12 +54,12 @@ Everything runs on your Mac. No account, no server, nothing leaves the machine u
 | **QR codes & barcodes** | Read alongside text in either mode; a link gets an **Open** button in the notification |
 | **Whole window** | Press **Space** while selecting to pick a window instead |
 | **Same spot again** | Press the shortcut again while selecting to reuse the last area |
-| **Fix it before you paste** | Hover the notification: join lines, edit, or **Undo** (restores your previous clipboard) |
+| **Fix it before you paste** | Buttons right in the notification: join lines (⌘J), edit (⌘E), or **Undo** (⌘Z, restores your previous clipboard). Drag over the preview to copy just part of it |
 | **35 interface languages** | Auto-follows macOS; right-to-left layout for Arabic and Hebrew |
 | **Busy-Mac warning** | Tells you when a heavy CPU load will slow reading down |
 
 <p align="center">
-  <img src="docs/images/capture-hint.png" width="760" alt="Selection hint bar with mode keys">
+  <img src="docs/images/hero.png" width="760" alt="The Jupjup menu and a notification with a copied table">
 </p>
 
 ## Install
@@ -90,6 +98,10 @@ Requires Xcode (tested with 26.3). The first build downloads two Swift packages 
 | 1 / 2 | Fast / Accurate mode for this capture (also saved as the default) |
 | ⇧⌘2 (your shortcut) | reuse the last area |
 | esc | cancel |
+
+<p align="center">
+  <img src="docs/images/capture-hint.png" width="760" alt="Selection hint bar with mode keys">
+</p>
 
 ## How it works
 
