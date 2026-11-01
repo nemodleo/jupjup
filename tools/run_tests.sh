@@ -25,6 +25,11 @@ cp tools/code_bench.swift "$OUT/code/main.swift"
 swiftc -O Sources/Recognizer.swift "$OUT/code/main.swift" -o "$OUT/code_bench" 2>&1 | grep -E "error" && fail=1
 "$OUT/code_bench" "$OUT/qr" 46 | tail -3 || fail=1
 
+echo "=== 3½. 띄어 읽힌 인증번호 붙이기"
+mkdir -p "$OUT/tidy" && cp tools/tidy_test.swift "$OUT/tidy/main.swift"
+swiftc -O Sources/Recognizer.swift "$OUT/tidy/main.swift" -o "$OUT/tidy_test" 2>&1 | grep -E "error" && fail=1
+"$OUT/tidy_test" | tail -1 || fail=1
+
 echo "=== 4. 인식 중 화면 멈춤 (기준 1000ms)"
 if [ -x "$APP/Contents/MacOS/Jupjup" ]; then
   line=$("$APP/Contents/MacOS/Jupjup" -benchocr 2>/dev/null)
