@@ -691,7 +691,10 @@ struct MenuRow: View {
 @MainActor
 enum Snapshot {
     static func render(to dir: String) {
-        let keepRecent = Settings.shared.recentLanguages
+        let keepRecent = Settings.shared.recentLanguages, keepLang = Settings.shared.language
+        // `-lang en`: 언어별 반복 밖의 그림(밝게·어둡게, 안내줄, 언어 화면 등)을 그 언어로. README 그림용
+        let base: Lang = CommandLine.arguments.firstIndex(of: "-lang").flatMap { i in i + 1 < CommandLine.arguments.count ? Lang(rawValue: CommandLine.arguments[i + 1]) : nil } ?? .auto
+        Settings.shared.language = base
         let sample = Recognizer.recognize(sampleImage())
         let toast = ToastModel()
         toast.result = sample
@@ -731,7 +734,7 @@ enum Snapshot {
             t3.kind = .working; t3.busyCPU = 94
             save(ToastView(model: t3, actions: actions), "\(dir)/busy-\(lang.rawValue).png")
         }
-        Settings.shared.language = .auto
+        Settings.shared.language = base
         NSApp.appearance = NSAppearance(named: .darkAqua)
         let up = MenuState(); up.page = .uiLanguage
         save(MenuView(settings: .shared, state: up, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-list.png")
@@ -758,13 +761,15 @@ enum Snapshot {
         save(AboutView(), "\(dir)/about.png")
         Settings.shared.language = Lang(rawValue: "en")
         save(AboutView(), "\(dir)/about-en.png")
-        Settings.shared.language = .auto
+        Settings.shared.language = base
         let lp = MenuState(); lp.page = .language
         save(MenuView(settings: .shared, state: lp, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-auto.png")
         let st = Settings.shared, keep = (st.ocrManual, st.ocrLanguages)
         st.ocrManual = true; st.ocrLanguages = ["ko-KR", "en-US", "ja-JP"]
         save(MenuView(settings: .shared, state: lp, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-manual.png")
         (st.ocrManual, st.ocrLanguages) = keep
+        Settings.shared.language = keepLang // 사용자가 고른 화면 언어로 되돌린다
+        Settings.shared.recentLanguages = keepRecent
         print(sample.table?.tsv ?? sample.text)
     }
 
@@ -783,7 +788,10 @@ enum Snapshot {
         NSGraphicsContext.saveGraphicsState()
         NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
         NSColor.white.setFill(); NSRect(x: 0, y: 0, width: 500, height: 180).fill()
-        let rows = [["이름", "학과", "학년", "점수"], ["김민지", "컴퓨터공학과", "3", "92.5"], ["Lee Jun", "경영학과", "2", "88"], ["박서연", "전기정보공학부", "4", "100"]]
+        // 화면 언어가 한국어가 아니면 영어 표(README·소개 그림용)
+        let rows = Settings.shared.language.resolved.rawValue == "ko"
+            ? [["이름", "학과", "학년", "점수"], ["김민지", "컴퓨터공학과", "3", "92.5"], ["Lee Jun", "경영학과", "2", "88"], ["박서연", "전기정보공학부", "4", "100"]]
+            : [["Name", "Major", "Year", "Score"], ["Mina Kim", "Computer Sci.", "3", "92.5"], ["Jun Lee", "Business", "2", "88"], ["Sara Park", "Physics", "4", "100"]]
         for (i, row) in rows.enumerated() {
             for (j, c) in row.enumerated() {
                 (c as NSString).draw(at: NSPoint(x: [20, 150, 320, 400][j], y: 140 - CGFloat(i) * 36), withAttributes: [.font: NSFont.systemFont(ofSize: 15)])

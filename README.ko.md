@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/hero.png" width="760" alt="줍줍 메뉴와 표로 담은 알림">
+  <img src="docs/images/hero.ko.png" width="760" alt="줍줍 메뉴와 표로 담은 알림">
 </p>
 
 ## 왜 줍줍인가요
@@ -51,7 +51,7 @@
 | **바쁨 경고** | CPU가 바빠 느려질 것 같으면 미리 알려 줘요 |
 
 <p align="center">
-  <img src="docs/images/capture-hint.png" width="760" alt="고르기 안내줄과 모드 키">
+  <img src="docs/images/capture-hint.ko.png" width="760" alt="고르기 안내줄과 모드 키">
 </p>
 
 ## 설치
