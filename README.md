@@ -55,6 +55,7 @@ Everything runs on your Mac. No account, no server, nothing leaves the machine u
 | **Whole window** | Press **Space** while selecting to pick a window instead |
 | **Same spot again** | Press the shortcut again while selecting to reuse the last area |
 | **Fix it before you paste** | Buttons right in the notification: join lines (⌘J), edit (⌘E), or **Undo** (⌘Z, restores your previous clipboard). Drag over the preview to copy just part of it |
+| **Sign-in codes** | Box a code in an email; even a widely spaced *4 8 2 9 1 3* is copied as *482913* |
 | **History** | The last 20 copies, on your Mac only. Pick one in the menu to copy it again, in the same shape (one line, table, edited) |
 | **35 interface languages** | Auto-follows macOS; right-to-left layout for Arabic and Hebrew |
 | **Busy-Mac warning** | Tells you when a heavy CPU load will slow reading down |
