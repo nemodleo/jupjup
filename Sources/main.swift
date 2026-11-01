@@ -32,6 +32,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if CommandLine.arguments.contains("-benchocr") { benchOCR(); return }
         if CommandLine.arguments.contains("-reporttest") { reportTest(); return }
         if let i = CommandLine.arguments.firstIndex(of: "-read"), i + 1 < CommandLine.arguments.count { readFile(CommandLine.arguments[i + 1]); return }
+        if CommandLine.arguments.contains("-checkupdate") { checkUpdate(); return }
         if let i = CommandLine.arguments.firstIndex(of: "-snapshot"), i + 1 < CommandLine.arguments.count {
             Snapshot.render(to: CommandLine.arguments[i + 1])
             exit(0)
@@ -84,6 +85,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         Reporting.start()
         Recognizer.warmUp()
+        UpdateChecker.shared.start()
         if Settings.shared.fastMode { LiveText.warmUp() }
         enableLoginOnFirstRun()
         hotKey.onPress = { [weak self] in self?.startCapture() }
@@ -180,6 +182,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         m.addItem(withTitle: "Paste", action: #selector(NSText.paste(_:)), keyEquivalent: "v")
         m.addItem(withTitle: "Select All", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
         NSApp.mainMenu = main
+    }
+
+    /// 진단: 새 버전 확인을 한 번 돌려 결과를 찍는다. `Jupjup -checkupdate` (배포 뒤 version.json 확인용)
+    private func checkUpdate() {
+        let u = UpdateChecker.shared
+        print("지금 \(u.current) · 확인 주소 \(u.feed.absoluteString)")
+        Settings.shared.updateCheck = true
+        u.check()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+            if let up = Settings.shared.update { print("새 버전 \(up.version) · \(up.url.absoluteString)") } else { print("새 버전 없음(또는 확인 실패)") }
+            exit(0)
+        }
     }
 
     /// 진단: PNG 한 장을 실제 줍기와 같은 경로(설정의 모드 → 코드 → 병합)로 읽어 표준 출력에. `Jupjup -read <png>`
@@ -400,6 +414,10 @@ struct MenuView: View {
         var about: () -> Void
         var quit: () -> Void
         var relayout: () -> Void = {}
+        var update: @MainActor (URL) -> Void = { url in
+            Reporting.signal("update.clicked")
+            NSWorkspace.shared.open(url)
+        }
     }
 
     @ObservedObject var settings: Settings
@@ -432,6 +450,7 @@ struct MenuView: View {
         .onChange(of: settings.ocrManual) { _, _ in DispatchQueue.main.async { actions.relayout() } }
         .onChange(of: settings.language) { _, _ in DispatchQueue.main.async { actions.relayout() } }
         .onChange(of: settings.fastMode) { _, _ in DispatchQueue.main.async { actions.relayout() } }
+        .onChange(of: settings.update) { _, _ in DispatchQueue.main.async { actions.relayout() } }
     }
 
     /// 가장 긴 줄에 맞춘 메뉴 폭(220~320). 바깥 여백 6 포함
@@ -448,6 +467,8 @@ struct MenuView: View {
             textWidth(t.language, 12.5) + 16 + textWidth(lang, 11) + 22,
             textWidth(t.ocrMode, 12.5) + 14 + textWidth(t.modeFast, 11, .semibold) + textWidth(t.modeAccurate, 11, .semibold) + 34 + 10,
             textWidth(t.about, 12.5) + 24,
+            textWidth(t.updateCheck, 12.5) + 8 + 36 + 18,
+            settings.update.map { textWidth(t.updateAvailable($0.version), 12.5, .medium) + textWidth(t.updateGet, 11.5) + 6 + 12 + 30 } ?? 0,
             textWidth(t.quit, 12.5) + 50,
             18 + 8 + textWidth(t.appName, 17) + 16 + textWidth(t.tagline, 11) + 28, // 이름 + 태그라인이 다 보이게
         ]
@@ -486,6 +507,9 @@ struct MenuView: View {
                     .padding(.horizontal, 8).padding(.top, 3)
             }
 
+            // 새 버전이 있으면 줍기 줄 바로 아래 주홍 한 줄. 누르면 내려받기 페이지(자동 설치는 안 함)
+            if let u = settings.update { UpdateRow(info: u) { actions.update(u.url) } }
+
             // 줍기(줄바꿈·표·모드·언어)와 앱(함께 열기·통계) 두 묶음 — 캔버스 10번 A
             section(L.s.sectionPick)
             toggle(L.s.joinLines, isOn: $settings.joinLines)
@@ -504,6 +528,7 @@ struct MenuView: View {
                 login = SMAppService.mainApp.status == .enabled
             }))
             toggle(L.s.reports, isOn: $settings.reports)
+            toggle(L.s.updateCheck, isOn: $settings.updateCheck)
             rule
             MenuRow(title: L.s.about, action: actions.about)
             MenuRow(title: L.s.quit, trailing: "⌘Q", action: actions.quit)
@@ -664,6 +689,31 @@ struct KeyCap: View {
     }
 }
 
+/// 새 버전 알림 줄: 옅은 주홍 바탕에 "새 버전 1.1" · "내려받기 ›"
+struct UpdateRow: View {
+    let info: UpdateInfo
+    let action: () -> Void
+    @State private var over = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Circle().fill(Color.seal).frame(width: 6, height: 6)
+                Text(L.s.updateAvailable(info.version)).font(Fonts.font(12.5, .medium)).foregroundStyle(Color.sealText)
+                Spacer(minLength: 4)
+                Text(L.s.updateGet).font(Fonts.font(11.5)).foregroundStyle(Color.sealText)
+                Image(systemName: "chevron.forward").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.sealText)
+            }
+            .padding(.horizontal, 8).frame(height: 28)
+            .background(RoundedRectangle(cornerRadius: 6).fill(Color.seal.opacity(over ? 0.2 : 0.12)))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { over = $0 }
+        .padding(.top, 4)
+    }
+}
+
 struct MenuRow: View {
     let title: String
     var trailing: String?
@@ -756,6 +806,9 @@ enum Snapshot {
         }
         Settings.shared.fastMode = true
         save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-fast.png")
+        Settings.shared.update = UpdateInfo(version: "1.1", url: URL(string: "https://jupjup.d-t-it.com/")!)
+        save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-update.png")
+        Settings.shared.update = nil
         Settings.shared.fastMode = keepFast
         Settings.shared.recentLanguages = keepRecent // 언어를 돌려 가며 그린 흔적이 사용자의 "최근"에 남지 않게
         save(AboutView(), "\(dir)/about.png")

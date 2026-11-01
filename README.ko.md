@@ -79,7 +79,7 @@ Xcode가 필요해요(26.3에서 확인). 첫 빌드는 Swift 패키지 두 개�
 
 > 자주 빌드한다면 `tools/make_cert.sh`를 한 번 실행해 두세요. 자체 서명 인증서("Jupjup Dev")를 만들어 `build.sh`가 그걸로 서명하게 되고, 그러면 다시 빌드해도 화면 기록 권한이 풀리지 않아요. 애드혹 서명은 빌드마다 바뀌어서 macOS가 권한을 매번 되물어요.
 
-**내려받기** — [jupjup.d-t-it.com](https://jupjup.d-t-it.com/ko/)에서 DMG를 받으세요(Universal, 4.4MB). 아직 공증 전이라 처음 열 때 시스템 설정 › 개인정보 보호 및 보안에서 *그래도 열기*를 눌러야 해요. 디스크 이미지 안에 방법이 적혀 있어요. 직접 만들려면 `tools/make_dmg.sh`.
+**내려받기** — [jupjup.d-t-it.com](https://jupjup.d-t-it.com/ko/)에서 DMG를 받으세요(Universal, 4.6MB). 아직 공증 전이라 처음 열 때 시스템 설정 › 개인정보 보호 및 보안에서 *그래도 열기*를 눌러야 해요. 디스크 이미지 안에 방법이 적혀 있어요. 직접 만들려면 `tools/make_dmg.sh`.
 
 ### 처음 켤 때
 
@@ -117,6 +117,8 @@ Xcode가 필요해요(26.3에서 확인). 첫 빌드는 Swift 패키지 두 개�
 전체 방침: [PRIVACY.md](PRIVACY.md#한국어).
 
 선택적인 **오류·사용 통계**(기본 켬, 메뉴나 첫 실행 창에서 한 번에 끔)는 *횟수와 분류*만 보내요. 예를 들면 "캡쳐 끝남, 2~5줄, 1초 미만, 표 아님" 같은 것이에요. [Sentry](https://sentry.io)(오류)와 [TelemetryDeck](https://telemetrydeck.com)(사용)으로 가요. 글자·이미지·좌표는 절대 보내지 않아요. 정확한 목록은 `Sources/Reporting.swift`에 있어요. 리포트 키 없이 빌드하면 아무것도 보내지 않아요.
+
+하루에 한 번 `jupjup.d-t-it.com/version.json`으로 새 버전이 있는지도 확인해요(쿠키·식별자 없음, 메뉴의 *새 버전 확인*으로 끔). 메뉴에 알려 주기만 하고 스스로 설치하지는 않아요.
 
 ## 필요한 것
 

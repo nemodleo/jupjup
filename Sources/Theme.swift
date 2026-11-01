@@ -190,13 +190,19 @@ final class Settings: ObservableObject {
             if reports { Reporting.start() } else { Reporting.stop() }
         }
     }
+    /// 새 버전 확인(기본 켬). 끄면 사이트에 묻지 않는다
+    @Published var updateCheck: Bool {
+        didSet { d.set(updateCheck, forKey: "updateCheck"); if updateCheck { UpdateChecker.shared.check() } else { update = nil } }
+    }
+    /// 사이트에 지금보다 새 버전이 있으면 그 버전과 내려받을 주소
+    @Published var update: UpdateInfo?
     /// 메뉴에서 새 단축키를 기다리는 중
     @Published var recording = false
     /// 녹음 결과 안내(쓸 수 없는 조합 등). 잠깐 보였다 사라진다
     @Published var shortcutNote: String?
 
     private init() {
-        d.register(defaults: ["joinLines": false, "tables": true, "reports": true,
+        d.register(defaults: ["joinLines": false, "tables": true, "reports": true, "updateCheck": true,
                               // 노치 뒤로 숨지 않게 오른쪽 끝 가까이 둔다(우연·묵묵과 같은 방법)
                               "NSStatusItem Preferred Position jupjup": 360])
         joinLines = d.bool(forKey: "joinLines")
@@ -207,6 +213,7 @@ final class Settings: ObservableObject {
         ocrFallback = d.object(forKey: "ocrFallback") as? Bool ?? true
         fastMode = d.bool(forKey: "fastMode")
         reports = d.bool(forKey: "reports")
+        updateCheck = d.bool(forKey: "updateCheck")
         if d.object(forKey: "hotKeyCode") != nil {
             shortcut = Shortcut(keyCode: UInt32(d.integer(forKey: "hotKeyCode")), carbonMods: UInt32(d.integer(forKey: "hotKeyMods")))
         } else {

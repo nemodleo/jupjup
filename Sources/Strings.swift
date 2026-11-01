@@ -89,6 +89,8 @@ struct Strings {
     var asText, asTable, keepLines, joinOne, edit, undo, cancel, save, done: String
     var qr, barcode, open: String
     var sectionPick, sectionApp, search, recent, retryAccurate, sameSpotAgain: String
+    var updateCheck, updateGet: String
+    var updateAvailable: (String) -> String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
     var escCancel: String
@@ -130,9 +132,10 @@ struct Strings {
         qr = v("qr"); barcode = v("barcode"); open = v("open")
         sectionPick = v("sectionPick"); sectionApp = v("sectionApp"); search = v("search"); recent = v("recent")
         retryAccurate = v("retryAccurate"); sameSpotAgain = v("sameSpotAgain")
+        updateCheck = v("updateCheck"); updateGet = v("updateGet"); updateAvailable = { fill("updateAvailable", ["v": $0]) }
         pickWindow = v("pickWindow"); spaceDrag = v("spaceDrag"); dragSelect = v("dragSelect"); spaceWindow = v("spaceWindow")
         sameSpot = { fill("sameSpot", ["s": $0]) }
-        escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = v("aboutBody")
+        escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = fill("aboutBody", ["version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""])
         back = v("back"); uiText = v("uiText"); ocrText = v("ocrText"); ocrAuto = v("ocrAuto"); ocrAutoSub = v("ocrAutoSub")
         ocrManual = v("ocrManual"); ocrManualSub = v("ocrManualSub"); fallback = v("fallback"); fallbackSub = v("fallbackSub")
         nowSystem = { fill("nowSystem", ["s": $0]) }
