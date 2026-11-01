@@ -226,6 +226,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let fallback = !st.ocrManual || st.ocrFallback
             let fast = st.fastMode
             Task.detached(priority: .userInitiated) {
+                // QR·바코드 첫 번째 보기는 글자 인식과 나란히(어느 모드에서나)
+                let quick = Task.detached(priority: .userInitiated) { Recognizer.codes(image, thorough: false) }
                 var result: Recognized
                 if fast, let live = await LiveText.read(image) {
                     result = live // 빠르게: 라이브 텍스트(못 쓰거나 못 읽으면 아래 Vision으로)
@@ -234,7 +236,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     // 정확하게: Vision이 못 읽었으면 라이브 텍스트로 한 번 더
                     if result.isEmpty, !fast, let live = await LiveText.read(image) { result = live }
                 }
-                result = Recognizer.merge(result, codes: Recognizer.codes(image)) // QR·바코드는 어느 모드에서나
+                // 못 찾았는데 글이 적으면(코드만 골랐을 가능성) 그림을 바꿔 가며 더 본다. 글이 많은 캡쳐는 늦어지지 않게 건너뜀
+                var codes = await quick.value
+                if codes.isEmpty, result.text.filter({ !$0.isWhitespace }).count < 200 { codes = Recognizer.codes(image) }
+                result = Recognizer.merge(result, codes: codes)
                 let done = result
                 await MainActor.run { self.deliver(done) }
             }

@@ -2,6 +2,7 @@ import Vision
 import VisionKit
 import NaturalLanguage
 import CoreGraphics
+import CoreImage
 import Foundation
 
 // 글자 인식 + 줄 묶기 + 표 알아보기. UI와 떨어져 있어 tools/ 테스트에서 그대로 컴파일한다.
@@ -74,20 +75,110 @@ struct Recognized {
 
 enum Recognizer {
     /// QR·바코드. 글자 인식과 별개 요청이라 빠르게·정확하게 어느 모드에서나 돈다. 같은 내용은 한 번만
-    static func codes(_ image: CGImage) -> [Code] {
+    /// thorough: 처음 한 번에 못 찾으면 그림을 바꿔 가며 다시 본다(아이폰 카메라가 여러 프레임·초점으로 하는 일을 한 장으로).
+    /// 바꾼 그림: 회색·대비 → 이진화 → 반전 → 흐리게 다듬어 이진화 → 확대 → 점 잇기 → 큰 화면은 조각. 하나라도 찾으면 멈춘다.
+    /// 디코더는 Vision, 그다음 CIDetector(옛 QR 디코더, Vision이 놓친 걸 가끔 잡음). 둘 다 체크섬을 검사해 엉뚱한 값은 안 나온다
+    static func codes(_ image: CGImage, thorough: Bool = true, budget: TimeInterval = 0.8) -> [Code] {
+        var found = detect(image, back: { $0 })
+        if found.isEmpty, thorough {
+            let start = Date()
+            for v in variants(image) {
+                if Date().timeIntervalSince(start) > budget { break }
+                guard let img = v.make() else { continue }
+                found = detect(img, back: v.back)
+                if !found.isEmpty { break }
+            }
+        }
+        var seen = Set<String>()
+        return found.filter { seen.insert($0.payload).inserted }.sorted { $0.rect.maxY > $1.rect.maxY } // 위에 있는 것부터
+    }
+
+    private static let flat: Set<VNBarcodeSymbology> = [.ean8, .ean13, .upce, .code39, .code39Checksum, .code39FullASCII, .code39FullASCIIChecksum,
+                                                        .code93, .code93i, .code128, .i2of5, .i2of5Checksum, .itf14, .codabar]
+    private static let ci = CIContext(options: [.cacheIntermediates: false])
+
+    /// 한 장에서 찾기. 좌표는 그 그림의 픽셀(왼쪽 아래 원점) → back으로 원래 그림 좌표로
+    private static func detect(_ image: CGImage, back: (CGRect) -> CGRect) -> [Code] {
+        let w = CGFloat(image.width), h = CGFloat(image.height)
         let req = VNDetectBarcodesRequest()
         try? VNImageRequestHandler(cgImage: image).perform([req])
-        let w = CGFloat(image.width), h = CGFloat(image.height)
-        let flat: Set<VNBarcodeSymbology> = [.ean8, .ean13, .upce, .code39, .code39Checksum, .code39FullASCII, .code39FullASCIIChecksum,
-                                             .code93, .code93i, .code128, .i2of5, .i2of5Checksum, .itf14, .codabar]
-        var seen = Set<String>()
-        return (req.results ?? []).compactMap { o in
-            guard let s = o.payloadStringValue?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty, seen.insert(s).inserted else { return nil }
+        var out: [Code] = (req.results ?? []).compactMap { o in
+            guard let s = o.payloadStringValue?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty else { return nil }
             let b = o.boundingBox
-            return Code(rect: CGRect(x: b.minX * w, y: b.minY * h, width: b.width * w, height: b.height * h),
+            return Code(rect: back(CGRect(x: b.minX * w, y: b.minY * h, width: b.width * w, height: b.height * h)),
                         payload: s, isQR: !flat.contains(o.symbology))
         }
-        .sorted { $0.rect.maxY > $1.rect.maxY } // 위에 있는 것부터
+        if out.isEmpty, let d = CIDetector(ofType: CIDetectorTypeQRCode, context: ci, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh]) {
+            out = d.features(in: CIImage(cgImage: image)).compactMap { f in
+                guard let q = f as? CIQRCodeFeature, let s = q.messageString?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty else { return nil }
+                return Code(rect: back(q.bounds), payload: s, isQR: true)
+            }
+        }
+        return out
+    }
+
+    private struct Variant { let make: () -> CGImage?; let back: (CGRect) -> CGRect }
+
+    /// 다시 볼 그림들. 싼 것부터. 만드는 건 차례가 왔을 때(앞에서 찾으면 뒤는 안 만든다)
+    private static func variants(_ image: CGImage) -> [Variant] {
+        let src = CIImage(cgImage: image)
+        let w = CGFloat(image.width), h = CGFloat(image.height), short = min(w, h)
+        func render(_ i: CIImage) -> CGImage? { ci.createCGImage(i, from: i.extent.integral, format: .L8, colorSpace: CGColorSpaceCreateDeviceGray()) }
+        func gray(_ i: CIImage, contrast: Double = 1) -> CIImage {
+            i.applyingFilter("CIColorControls", parameters: [kCIInputSaturationKey: 0, kCIInputContrastKey: contrast])
+        }
+        func otsu(_ i: CIImage) -> CIImage { i.applyingFilter("CIColorThresholdOtsu") }
+        func invert(_ i: CIImage) -> CIImage { i.applyingFilter("CIColorInvert") }
+        func scaled(_ i: CIImage, _ s: CGFloat) -> CIImage {
+            s == 1 ? i : i.applyingFilter("CILanczosScaleTransform", parameters: [kCIInputScaleKey: s, kCIInputAspectRatioKey: 1])
+        }
+        func blur(_ i: CIImage, _ r: CGFloat) -> CIImage {
+            i.clampedToExtent().applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: r]).cropped(to: i.extent)
+        }
+        /// 어두운 모듈을 r픽셀 넓혀 점·하트·마름모·가는 선 모듈을 이어 붙인다(어두운 모듈·밝은 바탕 기준)
+        func join(_ i: CIImage, _ r: CGFloat) -> CIImage {
+            i.clampedToExtent().applyingFilter("CIMorphologyMinimum", parameters: [kCIInputRadiusKey: r]).cropped(to: i.extent)
+        }
+        /// 모듈이 밝고 바탕이 어두운 그림이면 뒤집어 "어두운 모듈"로 맞춘다(가장자리 밝기로 바탕을 짐작)
+        let darkPaper: Bool = {
+            let strip = CGRect(x: 0, y: 0, width: w, height: max(1, h * 0.03)) // 아래 가장자리 띠 = 바탕
+            guard let avg = render(gray(src).applyingFilter("CIAreaAverage", parameters: [kCIInputExtentKey: CIVector(cgRect: strip)])) else { return false }
+            var p: UInt8 = 0
+            CGContext(data: &p, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 1, space: CGColorSpaceCreateDeviceGray(), bitmapInfo: 0)?
+                .draw(avg, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+            return p < 115
+        }()
+        let base = { (s: CGFloat) -> CIImage in let g = gray(scaled(src, s)); return darkPaper ? invert(g) : g }
+        let same: (CGRect) -> CGRect = { $0 }
+        // 작게 찍힌 코드일수록 많이 키운다. 너무 큰 그림은 키우지 않는다(느려지고 얻는 게 없음)
+        let up: CGFloat = short < 300 ? 4 : short < 700 ? 2.5 : short < 1400 ? 1.6 : 1
+        let back = { (s: CGFloat) -> (CGRect) -> CGRect in { CGRect(x: $0.minX / s, y: $0.minY / s, width: $0.width / s, height: $0.height / s) } }
+        // 모듈 크기는 모르지만 코드가 그림 대부분이면 한 변의 1/30~1/60쯤 → 그 비율로 잇기·흐리기 정도를 몇 단계
+        let unit = short * up / 45
+        var v: [Variant] = [
+            Variant(make: { render(gray(src, contrast: 1.6)) }, back: same),
+            Variant(make: { render(otsu(base(1))) }, back: same),
+            Variant(make: { render(invert(gray(src))) }, back: same),
+            Variant(make: { render(otsu(blur(base(1), max(1, short / 600)))) }, back: same),
+            Variant(make: { render(otsu(base(up))) }, back: back(up)),
+            // 색 로고·색 바탕: 가장 밝은 채널로 보면 분홍 로고·노란 칸은 바탕(밝음)이 되고 검은 모듈만 남는다
+            Variant(make: { render(otsu(scaled(src, up).applyingFilter("CIMaximumComponent"))) }, back: back(up)),
+        ]
+        for k: CGFloat in [0.15, 0.25, 0.35] {
+            v.append(Variant(make: { render(otsu(join(base(up), unit * k))) }, back: back(up)))
+            v.append(Variant(make: { render(otsu(blur(base(up), unit * k * 1.2))) }, back: back(up)))
+        }
+        // 큰 화면에 작은 코드: 겹치게 3×3 조각으로 나눠 키워서 본다
+        if short >= 900 {
+            let tw = w / 2, th = h / 2, s: CGFloat = 2.5
+            for ty in 0..<3 { for tx in 0..<3 {
+                let rect = CGRect(x: CGFloat(tx) * w / 4, y: CGFloat(ty) * h / 4, width: tw, height: th)
+                v.append(Variant(make: {
+                    render(gray(scaled(src.cropped(to: rect).transformed(by: CGAffineTransform(translationX: -rect.minX, y: -rect.minY)), s), contrast: 1.4))
+                }, back: { CGRect(x: $0.minX / s + rect.minX, y: $0.minY / s + rect.minY, width: $0.width / s, height: $0.height / s) }))
+            } }
+        }
+        return v
     }
 
     /// 코드 내용을 글 맨 앞에 한 줄씩 둔다(QR을 골랐으면 그 내용이 주인공, 옆 글자는 덤).
@@ -313,6 +404,8 @@ extension Recognizer {
             ctx?.setFillColor(CGColor(gray: 1, alpha: 1))
             ctx?.fill(CGRect(x: 0, y: 0, width: 64, height: 32))
             guard let img = ctx?.makeImage() else { return }
+            // 바코드 디코더도 처음엔 2초 넘게 걸린다(실측 2.3초)
+            _ = codes(img, thorough: false)
             // 문자권마다 모델을 처음 불러올 때 3~4초 걸린다 → 켤 때 뒤에서 한 번씩 미리
             _ = read(img, languages: OCRLanguages.firstPass(OCRLanguages.primary()), autoDetect: false)
             _ = read(img, languages: OCRLanguages.latin, autoDetect: false)
