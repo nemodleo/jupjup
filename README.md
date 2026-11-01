@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <a href="README.ko.md">한국어</a>
+  <a href="https://jupjup.d-t-it.com"><b>jupjup.d-t-it.com</b></a> · <a href="README.ko.md">한국어</a>
 </p>
 
 <p align="center">
@@ -71,7 +71,7 @@ Requires Xcode (tested with 26.3). The first build downloads two Swift packages 
 
 > If you rebuild often, run `tools/make_cert.sh` once. It creates a self-signed certificate ("Jupjup Dev") that `build.sh` then signs with, so macOS keeps the Screen Recording permission across rebuilds. Ad-hoc signatures change on every build, which makes macOS ask again each time.
 
-**Releases** — signed and notarized downloads are on the [roadmap](#roadmap).
+**Download** — get the DMG from [jupjup.d-t-it.com](https://jupjup.d-t-it.com) (Universal, 4.4 MB). It isn’t notarized yet: on first launch, open System Settings › Privacy & Security and click *Open Anyway*. The disk image includes the steps. Make your own with `tools/make_dmg.sh`.
 
 ### First launch
 
