@@ -45,6 +45,10 @@ final class ToastModel: ObservableObject {
     @Published var edited: String?
 
     var backup: ClipboardBackup?
+    /// 이번에 담은 글의 기록 id. 모양을 바꾸면 같은 기록이 고쳐진다
+    var entryID: UUID?
+    /// 기록에서 다시 담은 것이면 true(되돌려도 기록은 남긴다)
+    var fromHistory = false
 
     var copiedText: String {
         if let edited { return edited }
@@ -92,6 +96,7 @@ final class ToastModel: ObservableObject {
         } else {
             pb.setString(copiedText, forType: .string)
         }
+        if let entryID { History.shared.put(entryID, model: self) }
     }
 }
 
@@ -111,7 +116,8 @@ final class ToastController {
     var onRetryAccurate: (() -> Void)?
     var onSameSpot: (() -> Void)?
 
-    func show(_ kind: ToastModel.Kind, result: Recognized? = nil, backup: ClipboardBackup? = nil, busyCPU: Int? = nil) {
+    /// entry: 기록에서 다시 담을 때. 그때의 모양(한 줄·표·고친 글)으로 띄운다
+    func show(_ kind: ToastModel.Kind, result: Recognized? = nil, backup: ClipboardBackup? = nil, busyCPU: Int? = nil, entry: HistoryEntry? = nil) {
         let m = model
         if kind != m.kind || kind == .picked { m.stampID = UUID() }
         m.kind = kind
@@ -124,6 +130,13 @@ final class ToastController {
             m.asTable = Settings.shared.tables && result.table != nil
             m.joined = Settings.shared.joinLines
             m.backup = backup
+            m.entryID = kind == .picked ? entry?.id ?? UUID() : nil
+            m.fromHistory = entry != nil
+        }
+        if let entry {
+            m.joined = entry.joined
+            m.asTable = entry.asTable && m.result.table != nil
+            m.edited = entry.edited
         }
         if kind == .picked { m.writeClipboard() }
 
@@ -272,6 +285,8 @@ final class ToastController {
     private func undo() {
         Reporting.signal("toast.undo")
         model.backup?.restore()
+        if let id = model.entryID, !model.fromHistory { History.shared.remove(id) }
+        model.entryID = nil
         model.kind = .undone
         model.hovering = false
         relayout()

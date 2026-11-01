@@ -1,6 +1,6 @@
 import Foundation
 
-// 화면 문구. 언어마다 Resources/Strings/<코드>.json 하나(키 61개, {n}{c}{r}{s} 자리표시).
+// 화면 문구. 언어마다 Resources/Strings/<코드>.json 하나(키 67개, {n}{c}{r}{s} 자리표시).
 // 메뉴에서 바꾸면 다시 켜지 않아도 바로 바뀐다. 파일에 없는 키는 영어로.
 
 /// 화면 언어. "auto"는 시스템을 따른다
@@ -90,6 +90,7 @@ struct Strings {
     var qr, barcode, open: String
     var sectionPick, sectionApp, search, recent, retryAccurate, sameSpotAgain: String
     var updateCheck, updateGet: String
+    var history, historyEmpty, historyOff, historyKeep, historyClear, historyNote, historyTable: String
     var updateAvailable: (String) -> String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
@@ -133,6 +134,8 @@ struct Strings {
         sectionPick = v("sectionPick"); sectionApp = v("sectionApp"); search = v("search"); recent = v("recent")
         retryAccurate = v("retryAccurate"); sameSpotAgain = v("sameSpotAgain")
         updateCheck = v("updateCheck"); updateGet = v("updateGet"); updateAvailable = { fill("updateAvailable", ["v": $0]) }
+        history = v("history"); historyEmpty = v("historyEmpty"); historyOff = v("historyOff")
+        historyKeep = v("historyKeep"); historyClear = v("historyClear"); historyNote = v("historyNote"); historyTable = v("historyTable")
         pickWindow = v("pickWindow"); spaceDrag = v("spaceDrag"); dragSelect = v("dragSelect"); spaceWindow = v("spaceWindow")
         sameSpot = { fill("sameSpot", ["s": $0]) }
         escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = fill("aboutBody", ["version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""])

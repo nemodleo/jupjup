@@ -77,5 +77,12 @@
  "ocrMode": "Modus",
  "modeFast": "Rask",
  "modeAccurate": "Nøyaktig",
- "modeFastNote": "Rask bruker Live-tekst. Tabeller og språkvalg kun i Nøyaktig."
+ "modeFastNote": "Rask bruker Live-tekst. Tabeller og språkvalg kun i Nøyaktig.",
+ "history": "Historikk",
+ "historyEmpty": "Ingenting fanget ennå",
+ "historyOff": "Historikk er av",
+ "historyKeep": "Behold historikk",
+ "historyClear": "Tøm historikk",
+ "historyNote": "De siste 20 blir bare på denne Macen.",
+ "historyTable": "Tabell"
 }

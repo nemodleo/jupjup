@@ -77,5 +77,12 @@
  "ocrMode": "Način",
  "modeFast": "Brzo",
  "modeAccurate": "Precizno",
- "modeFastNote": "Brzo koristi Tekst uživo. Tablice i jezici samo u načinu Precizno."
+ "modeFastNote": "Brzo koristi Tekst uživo. Tablice i jezici samo u načinu Precizno.",
+ "history": "Povijest",
+ "historyEmpty": "Još ništa nije snimljeno",
+ "historyOff": "Povijest je isključena",
+ "historyKeep": "Čuvaj povijest",
+ "historyClear": "Očisti povijest",
+ "historyNote": "Zadnjih 20 ostaje samo na ovom Macu.",
+ "historyTable": "Tablica"
 }

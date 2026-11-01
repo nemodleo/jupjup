@@ -98,5 +98,12 @@
  "obReports": "错误与使用统计",
  "obReportsBody": "只发送崩溃和识别失败的次数，绝不发送屏幕或文字内容。可随时在菜单中关闭。",
  "obReportsOn": "默认开启 · 点击关闭",
- "obReportsOff": "已关闭 · 点击开启"
+ "obReportsOff": "已关闭 · 点击开启",
+ "history": "历史记录",
+ "historyEmpty": "还没有拾取过文字",
+ "historyOff": "未保留历史记录",
+ "historyKeep": "保留历史记录",
+ "historyClear": "清除全部记录",
+ "historyNote": "最近 20 条仅保存在这台 Mac 上。",
+ "historyTable": "表格"
 }

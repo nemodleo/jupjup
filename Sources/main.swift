@@ -33,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if CommandLine.arguments.contains("-reporttest") { reportTest(); return }
         if let i = CommandLine.arguments.firstIndex(of: "-read"), i + 1 < CommandLine.arguments.count { readFile(CommandLine.arguments[i + 1]); return }
         if CommandLine.arguments.contains("-checkupdate") { checkUpdate(); return }
+        if CommandLine.arguments.contains("-historytest") { exit(History.selfTest() ? 0 : 1) }
         if let i = CommandLine.arguments.firstIndex(of: "-snapshot"), i + 1 < CommandLine.arguments.count {
             Snapshot.render(to: CommandLine.arguments[i + 1])
             exit(0)
@@ -356,7 +357,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 record: { [weak self] in self?.startRecording() },
                 about: { [weak self] in self?.about() },
                 quit: { NSApp.terminate(nil) },
-                relayout: { [weak self] in self?.layoutMenu() })))
+                relayout: { [weak self] in self?.layoutMenu() },
+                recall: { [weak self] e in self?.recall(e) })))
             menuPanel = p
         }
         menuState.page = .main
@@ -400,6 +402,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appBeforeMenu = nil
     }
 
+    /// 기록을 누르면: 그때 담았던 모양 그대로 다시 클립보드에, 알림으로 보여 준다(되돌리기 = 지금 클립보드로)
+    private func recall(_ e: HistoryEntry) {
+        closeMenu()
+        Reporting.signal("history.recalled")
+        toast.show(.picked, result: e.recognized, backup: ClipboardBackup(), entry: e)
+    }
+
     private func about() {
         closeMenu()
         NSApp.activate(ignoringOtherApps: true)
@@ -414,6 +423,7 @@ struct MenuView: View {
         var about: () -> Void
         var quit: () -> Void
         var relayout: () -> Void = {}
+        var recall: (HistoryEntry) -> Void = { _ in }
         var update: @MainActor (URL) -> Void = { url in
             Reporting.signal("update.clicked")
             NSWorkspace.shared.open(url)
@@ -425,6 +435,8 @@ struct MenuView: View {
     let actions: Actions
     @State private var login = SMAppService.mainApp.status == .enabled
     @State private var hoverLang = false
+    @State private var hoverHistory = false
+    @ObservedObject private var history = History.shared
     /// "글자 줍기" 줄에 마우스가 있으면 오른쪽 키 표시가 "바꾸기"로
     @State private var pickHover = false
 
@@ -435,12 +447,14 @@ struct MenuView: View {
                 LanguagePage(settings: settings, back: { state.page = .main }, openUILanguages: { state.page = .uiLanguage })
             case .uiLanguage:
                 UILanguagePage(settings: settings) { state.page = .language }
+            case .history:
+                HistoryPage(settings: settings, history: .shared, back: { state.page = .main }, pick: actions.recall)
             case .main:
                 mainPage
             }
         }
         .padding(6)
-        .frame(width: state.page == .main ? mainWidth : 232)
+        .frame(width: state.page == .main ? mainWidth : state.page == .history ? 280 : 232)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.inkPanel))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.inkBorder))
         .shadow(color: .black.opacity(0.26), radius: 14, y: 8)
@@ -451,6 +465,7 @@ struct MenuView: View {
         .onChange(of: settings.language) { _, _ in DispatchQueue.main.async { actions.relayout() } }
         .onChange(of: settings.fastMode) { _, _ in DispatchQueue.main.async { actions.relayout() } }
         .onChange(of: settings.update) { _, _ in DispatchQueue.main.async { actions.relayout() } }
+        .onChange(of: history.entries.count) { _, _ in DispatchQueue.main.async { actions.relayout() } }
     }
 
     /// 가장 긴 줄에 맞춘 메뉴 폭(220~320). 바깥 여백 6 포함
@@ -465,6 +480,7 @@ struct MenuView: View {
             textWidth(t.tables, 12.5) + 8 + 36 + 18,
             textWidth(t.reports, 12.5) + 8 + 36 + 18,
             textWidth(t.language, 12.5) + 16 + textWidth(lang, 11) + 22,
+            textWidth(t.history, 12.5) + 16 + 60 + 22, // 최근 글은 남는 폭만큼 잘라 보인다
             textWidth(t.ocrMode, 12.5) + 14 + textWidth(t.modeFast, 11, .semibold) + textWidth(t.modeAccurate, 11, .semibold) + 34 + 10,
             textWidth(t.about, 12.5) + 24,
             textWidth(t.updateCheck, 12.5) + 8 + 36 + 18,
@@ -522,6 +538,7 @@ struct MenuView: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 8).padding(.bottom, 4)
             languageRow
+            historyRow
             section(L.s.sectionApp)
             toggle(L.s.openAtLogin, isOn: Binding(get: { login }, set: { on in
                 try? on ? SMAppService.mainApp.register() : SMAppService.mainApp.unregister()
@@ -569,6 +586,24 @@ struct MenuView: View {
         }
         .buttonStyle(.plain)
         .onHover { hoverLang = $0 }
+    }
+
+    /// 기록 한 줄: 가장 최근에 담은 글 첫머리를 옅게, 누르면 기록 화면으로
+    private var historyRow: some View {
+        Button { state.page = .history } label: {
+            HStack(spacing: 6) {
+                Text(L.s.history).font(Fonts.font(12.5)).foregroundStyle(Color.inkSub)
+                Spacer(minLength: 12)
+                Text(history.entries.first?.title ?? "").font(Fonts.font(11)).foregroundStyle(Color.inkFaint)
+                    .lineLimit(1).truncationMode(.tail)
+                Image(systemName: "chevron.forward").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.inkFaint)
+            }
+            .padding(.horizontal, 8).frame(height: 28)
+            .background(RoundedRectangle(cornerRadius: 6).fill(hoverHistory ? Color.inkFill : .clear))
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onHover { hoverHistory = $0 }
     }
 
     private var rule: some View {
@@ -815,6 +850,28 @@ enum Snapshot {
         Settings.shared.language = Lang(rawValue: "en")
         save(AboutView(), "\(dir)/about-en.png")
         Settings.shared.language = base
+        // 기록 화면(디스크에 안 쓰는 보기용 기록)
+        let now = Date()
+        func entry(_ lines: [String], ago: Double, table: [[String]]? = nil, qr: String? = nil, joined: Bool = false) -> HistoryEntry {
+            HistoryEntry(id: UUID(), date: now.addingTimeInterval(-ago), lines: lines, table: table,
+                         codes: qr.map { [.init(payload: $0, isQR: true)] } ?? [], joined: joined, asTable: table != nil, edited: nil)
+        }
+        let demo = History(preview: [
+            entry(text.lines.map { $0.map(\.text).joined() }, ago: 40, joined: true),
+            entry(sample.lines.map { $0.map(\.text).joined(separator: " ") }, ago: 60 * 7, table: sample.table?.rows),
+            entry([qrURL], ago: 60 * 60 * 2, qr: qrURL),
+            entry(["Least squares minimizes the sum of squared residuals."], ago: 60 * 60 * 26),
+        ])
+        let hp = MenuState(); hp.page = .history
+        for (name, appearance) in [("light", NSAppearance(named: .aqua)!), ("dark", NSAppearance(named: .darkAqua)!)] {
+            NSApp.appearance = appearance
+            appearance.performAsCurrentDrawingAppearance {
+                save(HistoryPage(settings: .shared, history: demo, back: {}, pick: { _ in })
+                        .padding(6).frame(width: 280)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.inkPanel))
+                        .padding(18), "\(dir)/history-\(name).png")
+            }
+        }
         let lp = MenuState(); lp.page = .language
         save(MenuView(settings: .shared, state: lp, actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/lang-auto.png")
         let st = Settings.shared, keep = (st.ocrManual, st.ocrLanguages)

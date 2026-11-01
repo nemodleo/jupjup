@@ -77,5 +77,12 @@
  "ocrMode": "Mode",
  "modeFast": "Cepat",
  "modeAccurate": "Akurat",
- "modeFastNote": "Cepat memakai Teks Langsung. Tabel dan pilihan bahasa hanya di Akurat."
+ "modeFastNote": "Cepat memakai Teks Langsung. Tabel dan pilihan bahasa hanya di Akurat.",
+ "history": "Riwayat",
+ "historyEmpty": "Belum ada yang diambil",
+ "historyOff": "Riwayat dimatikan",
+ "historyKeep": "Simpan riwayat",
+ "historyClear": "Hapus riwayat",
+ "historyNote": "20 terakhir hanya disimpan di Mac ini.",
+ "historyTable": "Tabel"
 }

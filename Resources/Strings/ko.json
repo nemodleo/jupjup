@@ -98,5 +98,12 @@
  "obReports": "오류·사용 통계 보내기",
  "obReportsBody": "앱이 죽거나 못 읽은 횟수만 보내요. 화면과 글 내용은 절대 보내지 않아요. 언제든 메뉴에서 끌 수 있어요.",
  "obReportsOn": "기본 켬 · 눌러서 끄기",
- "obReportsOff": "꺼짐 · 눌러서 켜기"
+ "obReportsOff": "꺼짐 · 눌러서 켜기",
+ "history": "기록",
+ "historyEmpty": "아직 주운 글이 없어요",
+ "historyOff": "기록을 남기지 않아요",
+ "historyKeep": "기록 남기기",
+ "historyClear": "기록 모두 지우기",
+ "historyNote": "최근 20개를 이 맥에만 둬요.",
+ "historyTable": "표"
 }

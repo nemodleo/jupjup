@@ -194,6 +194,10 @@ final class Settings: ObservableObject {
     @Published var updateCheck: Bool {
         didSet { d.set(updateCheck, forKey: "updateCheck"); if updateCheck { UpdateChecker.shared.check() } else { update = nil } }
     }
+    /// 복사 기록 남기기(기본 켬, 이 맥에만 최근 20개). 끄면 있던 기록도 지운다
+    @Published var history: Bool {
+        didSet { d.set(history, forKey: "history"); if !history { History.shared.clear() } }
+    }
     /// 사이트에 지금보다 새 버전이 있으면 그 버전과 내려받을 주소
     @Published var update: UpdateInfo?
     /// 메뉴에서 새 단축키를 기다리는 중
@@ -202,7 +206,7 @@ final class Settings: ObservableObject {
     @Published var shortcutNote: String?
 
     private init() {
-        d.register(defaults: ["joinLines": false, "tables": true, "reports": true, "updateCheck": true,
+        d.register(defaults: ["joinLines": false, "tables": true, "reports": true, "updateCheck": true, "history": true,
                               // 노치 뒤로 숨지 않게 오른쪽 끝 가까이 둔다(우연·묵묵과 같은 방법)
                               "NSStatusItem Preferred Position jupjup": 360])
         joinLines = d.bool(forKey: "joinLines")
@@ -214,6 +218,7 @@ final class Settings: ObservableObject {
         fastMode = d.bool(forKey: "fastMode")
         reports = d.bool(forKey: "reports")
         updateCheck = d.bool(forKey: "updateCheck")
+        history = d.bool(forKey: "history")
         if d.object(forKey: "hotKeyCode") != nil {
             shortcut = Shortcut(keyCode: UInt32(d.integer(forKey: "hotKeyCode")), carbonMods: UInt32(d.integer(forKey: "hotKeyMods")))
         } else {

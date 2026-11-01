@@ -77,5 +77,12 @@
  "ocrMode": "Tilstand",
  "modeFast": "Hurtig",
  "modeAccurate": "Præcis",
- "modeFastNote": "Hurtig bruger Live Tekst. Tabeller og sprogvalg kun i Præcis."
+ "modeFastNote": "Hurtig bruger Live Tekst. Tabeller og sprogvalg kun i Præcis.",
+ "history": "Historik",
+ "historyEmpty": "Intet fanget endnu",
+ "historyOff": "Historik er slået fra",
+ "historyKeep": "Gem historik",
+ "historyClear": "Ryd historik",
+ "historyNote": "De seneste 20 bliver kun på denne Mac.",
+ "historyTable": "Tabel"
 }

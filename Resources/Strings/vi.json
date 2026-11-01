@@ -77,5 +77,12 @@
  "ocrMode": "Chế độ",
  "modeFast": "Nhanh",
  "modeAccurate": "Chính xác",
- "modeFastNote": "Nhanh dùng Văn bản trực tiếp. Bảng và chọn ngôn ngữ chỉ ở Chính xác."
+ "modeFastNote": "Nhanh dùng Văn bản trực tiếp. Bảng và chọn ngôn ngữ chỉ ở Chính xác.",
+ "history": "Lịch sử",
+ "historyEmpty": "Chưa nhặt chữ nào",
+ "historyOff": "Lịch sử đang tắt",
+ "historyKeep": "Giữ lịch sử",
+ "historyClear": "Xoá lịch sử",
+ "historyNote": "20 mục gần nhất chỉ lưu trên máy Mac này.",
+ "historyTable": "Bảng"
 }

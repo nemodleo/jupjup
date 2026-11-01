@@ -77,5 +77,12 @@
  "ocrMode": "Режим",
  "modeFast": "Жылдам",
  "modeAccurate": "Дәл",
- "modeFastNote": "Жылдам режим Live Text қолданады. Кесте мен тіл таңдау тек Дәл режимде."
+ "modeFastNote": "Жылдам режим Live Text қолданады. Кесте мен тіл таңдау тек Дәл режимде.",
+ "history": "Тарих",
+ "historyEmpty": "Әзірге ештеңе алынған жоқ",
+ "historyOff": "Тарих өшірулі",
+ "historyKeep": "Тарихты сақтау",
+ "historyClear": "Тарихты тазалау",
+ "historyNote": "Соңғы 20-сы тек осы Mac-та сақталады.",
+ "historyTable": "Кесте"
 }

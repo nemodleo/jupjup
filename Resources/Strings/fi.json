@@ -77,5 +77,12 @@
  "ocrMode": "Tila",
  "modeFast": "Nopea",
  "modeAccurate": "Tarkka",
- "modeFastNote": "Nopea käyttää Live Textiä. Taulukot ja kielet vain Tarkka-tilassa."
+ "modeFastNote": "Nopea käyttää Live Textiä. Taulukot ja kielet vain Tarkka-tilassa.",
+ "history": "Historia",
+ "historyEmpty": "Ei vielä kaappauksia",
+ "historyOff": "Historia on pois päältä",
+ "historyKeep": "Säilytä historia",
+ "historyClear": "Tyhjennä historia",
+ "historyNote": "Viimeiset 20 jäävät vain tähän Maciin.",
+ "historyTable": "Taulukko"
 }

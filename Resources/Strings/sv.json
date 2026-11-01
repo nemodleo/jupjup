@@ -77,5 +77,12 @@
  "ocrMode": "Läge",
  "modeFast": "Snabb",
  "modeAccurate": "Exakt",
- "modeFastNote": "Snabb använder Live Text. Tabeller och språkval bara i Exakt."
+ "modeFastNote": "Snabb använder Live Text. Tabeller och språkval bara i Exakt.",
+ "history": "Historik",
+ "historyEmpty": "Inget fångat än",
+ "historyOff": "Historik är av",
+ "historyKeep": "Spara historik",
+ "historyClear": "Rensa historik",
+ "historyNote": "De senaste 20 stannar bara på den här Macen.",
+ "historyTable": "Tabell"
 }

@@ -6,7 +6,7 @@ import SwiftUI
 /// 메뉴가 어느 화면인지. 메뉴를 열 때마다 처음 화면으로
 @MainActor
 final class MenuState: ObservableObject {
-    enum Page { case main, language, uiLanguage }
+    enum Page { case main, language, uiLanguage, history }
     @Published var page: Page = .main
 }
 

@@ -77,5 +77,12 @@
  "ocrMode": "Mode",
  "modeFast": "Rapide",
  "modeAccurate": "Précise",
- "modeFastNote": "Rapide utilise Texte en direct. Tableaux et langues : mode Précise."
+ "modeFastNote": "Rapide utilise Texte en direct. Tableaux et langues : mode Précise.",
+ "history": "Historique",
+ "historyEmpty": "Rien de capturé pour l’instant",
+ "historyOff": "L’historique est désactivé",
+ "historyKeep": "Garder l’historique",
+ "historyClear": "Effacer l’historique",
+ "historyNote": "Les 20 derniers restent sur ce Mac uniquement.",
+ "historyTable": "Tableau"
 }

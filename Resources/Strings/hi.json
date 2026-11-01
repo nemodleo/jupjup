@@ -77,5 +77,12 @@
  "ocrMode": "मोड",
  "modeFast": "तेज़",
  "modeAccurate": "सटीक",
- "modeFastNote": "तेज़ मोड लाइव टेक्स्ट से। टेबल और भाषा चुनना केवल सटीक में।"
+ "modeFastNote": "तेज़ मोड लाइव टेक्स्ट से। टेबल और भाषा चुनना केवल सटीक में।",
+ "history": "इतिहास",
+ "historyEmpty": "अभी तक कुछ नहीं उठाया",
+ "historyOff": "इतिहास बंद है",
+ "historyKeep": "इतिहास रखें",
+ "historyClear": "इतिहास साफ़ करें",
+ "historyNote": "आख़िरी 20 सिर्फ़ इसी Mac पर रहते हैं।",
+ "historyTable": "तालिका"
 }

@@ -77,5 +77,12 @@
  "ocrMode": "Modus",
  "modeFast": "Snel",
  "modeAccurate": "Nauwkeurig",
- "modeFastNote": "Snel gebruikt Live Tekst. Tabellen en taalkeuze alleen bij Nauwkeurig."
+ "modeFastNote": "Snel gebruikt Live Tekst. Tabellen en taalkeuze alleen bij Nauwkeurig.",
+ "history": "Geschiedenis",
+ "historyEmpty": "Nog niets vastgelegd",
+ "historyOff": "Geschiedenis staat uit",
+ "historyKeep": "Geschiedenis bewaren",
+ "historyClear": "Geschiedenis wissen",
+ "historyNote": "De laatste 20 blijven alleen op deze Mac.",
+ "historyTable": "Tabel"
 }

@@ -98,5 +98,12 @@
  "obReports": "エラー・利用統計",
  "obReportsBody": "クラッシュや読み取り失敗の回数だけを送ります。画面や文字の内容は送りません。メニューからいつでもオフにできます。",
  "obReportsOn": "初期設定オン · クリックでオフ",
- "obReportsOff": "オフ · クリックでオン"
+ "obReportsOff": "オフ · クリックでオン",
+ "history": "履歴",
+ "historyEmpty": "まだ拾った文字はありません",
+ "historyOff": "履歴は残していません",
+ "historyKeep": "履歴を残す",
+ "historyClear": "履歴をすべて消去",
+ "historyNote": "最近の20件をこのMacにだけ保存します。",
+ "historyTable": "表"
 }

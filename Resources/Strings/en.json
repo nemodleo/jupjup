@@ -98,5 +98,12 @@
  "obReports": "Error & usage reports",
  "obReportsBody": "Only counts of crashes and failed captures. Never your screen or the text. Turn it off any time in the menu.",
  "obReportsOn": "On by default · click to turn off",
- "obReportsOff": "Off · click to turn on"
+ "obReportsOff": "Off · click to turn on",
+ "history": "History",
+ "historyEmpty": "Nothing captured yet",
+ "historyOff": "History is off",
+ "historyKeep": "Keep History",
+ "historyClear": "Clear History",
+ "historyNote": "The last 20 stay on this Mac only.",
+ "historyTable": "Table"
 }
