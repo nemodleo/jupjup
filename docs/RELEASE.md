@@ -6,7 +6,7 @@
 4. `git tag v<버전> && git push origin v<버전>`
 5. GitHub 릴리스에 DMG를 붙여 올린다(파일 이름 `Jupjup-<버전>.dmg` 그대로):
    `gh release create v<버전> build/Jupjup-<버전>.dmg --title "Jupjup <버전>" --notes-file <노트>`
-6. 소개 사이트(`nemodleo/jupjup-web`)는 한 시간 안에 `sync-release`가 최신 릴리스를 읽어 버전·크기·링크와 `version.json`을 다시 만들고 커밋 → Cloudflare가 배포. 공개 저장소라 60일 넘게 조용하면 예약 실행이 꺼져 있을 수 있으니, 릴리스 뒤엔 바로 돌린다:
-   `gh workflow enable sync-release -R nemodleo/jupjup-web; gh workflow run sync-release -R nemodleo/jupjup-web`
+6. 소개 사이트(`nemodleo/jupjup-web`)는 한 시간 안에 `sync-release`가 최신 릴리스를 읽어 버전·크기·링크와 `version.json`을 다시 만들고 커밋 → Cloudflare가 배포. 바로 하려면
+   `gh workflow run sync-release -R nemodleo/jupjup-web`
    - 앱은 `version.json`을 켤 때와 하루에 한 번 읽어, 새 버전이면 메뉴 맨 위에 "새 버전 x.y · 내려받기"를 띄운다.
 7. 확인: `curl -s https://jupjup.d-t-it.com/version.json`, 그리고 설치된 옛 버전에서 `/Applications/Jupjup.app/Contents/MacOS/Jupjup -checkupdate`.
