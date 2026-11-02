@@ -33,6 +33,8 @@ final class AboutController {
 struct AboutView: View {
     static let repo = URL(string: "https://github.com/nemodleo/jupjup")!
     static let privacy = URL(string: "https://github.com/nemodleo/jupjup/blob/main/PRIVACY.md")!
+    /// 연락 메일. 저장소의 CONTACT 한 곳에서 빌드 때 Info.plist로 들어온다(`make contact EMAIL=…`로 바꿈)
+    static let contact = (Bundle.main.infoDictionary?["JJContactEmail"] as? String).flatMap { $0.contains("@") ? $0 : nil }
 
     var body: some View {
         let paras = L.s.aboutBody.components(separatedBy: "\n\n")
@@ -58,6 +60,12 @@ struct AboutView: View {
                 Text(last).font(.system(size: 11)).foregroundStyle(Color.inkFaint)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 2)
+            }
+            if let mail = Self.contact, let url = URL(string: "mailto:\(mail)") {
+                Button { NSWorkspace.shared.open(url) } label: {
+                    Text(mail).font(.system(size: 11.5)).foregroundStyle(Color.sealText).underline(color: Color.sealText.opacity(0.4))
+                }
+                .buttonStyle(.plain)
             }
             HStack(spacing: 8) {
                 Spacer()

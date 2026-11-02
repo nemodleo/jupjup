@@ -7,7 +7,7 @@ NOTES   := docs/releases/$(VERSION).md
 SNAP    ?= $(TMPDIR)jupjup-snap
 
 .DEFAULT_GOAL := help
-.PHONY: help build test dmg release site check-update snapshot cert icon clean
+.PHONY: help build test dmg release site check-update snapshot cert icon contact clean
 
 help: ## 이 목록
 	@echo "줍줍 $(VERSION)"
@@ -44,6 +44,9 @@ cert: ## 자체 서명 인증서 "Jupjup Dev" 만들기(한 번만)
 
 icon: ## 앱 아이콘 다시 그리기 → Resources/AppIcon.icns
 	swift tools/make_icon.swift
+
+contact: ## 연락 메일 바꾸기(CONTACT 기준으로 문서·앱·사이트): make contact EMAIL=new@example.com
+	tools/set_contact.sh $(EMAIL)
 
 clean: ## build/ 와 생성된 Xcode 프로젝트 지우기
 	rm -rf build Jupjup.xcodeproj

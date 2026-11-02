@@ -14,7 +14,7 @@ security find-identity -v -p codesigning 2>/dev/null | grep -q '"Jupjup Dev"' &&
 [ "$IDENTITY" = "-" ] && echo "애드혹 서명 (tools/make_cert.sh를 한 번 실행하면 권한이 안 풀림)"
 xcodegen generate --quiet
 xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release -derivedDataPath "$BUILD" \
-  JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" \
+  JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" JJ_CONTACT="$(head -1 CONTACT)" \
   -quiet build
 APP="$BUILD/Build/Products/Release/Jupjup.app"
 pkill -x Jupjup 2>/dev/null && sleep 1 || true

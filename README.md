@@ -135,6 +135,10 @@ Once a day Jupjup also checks `jupjup.d-t-it.com/version.json` for a newer versi
 - [x] Capture history
 - [ ] Mac App Store
 
+## Contact
+
+[jupjup@d-t-it.com](mailto:jupjup@d-t-it.com) for questions and privacy requests. Bugs and ideas are welcome as [issues](https://github.com/nemodleo/jupjup/issues).
+
 ## Contributing
 
 Issues and pull requests are welcome.

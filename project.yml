@@ -65,6 +65,7 @@ targets:
         NSHumanReadableCopyright: ""
         JJSentryDSN: $(JJ_SENTRY_DSN)
         JJTelemetryAppID: $(JJ_TELEMETRY_APP_ID)
+        JJContactEmail: $(JJ_CONTACT)
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nemo.jupjup

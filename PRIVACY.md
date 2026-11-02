@@ -73,7 +73,7 @@ If this policy changes, the date at the top changes and the new version is publi
 
 ## Contact
 
-Open an issue at [github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup/issues).
+Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup/issues).
 
 ---
 
@@ -152,4 +152,4 @@ Open an issue at [github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup
 
 ## 문의
 
-[github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup/issues)에 이슈를 남겨 주세요.
+[jupjup@d-t-it.com](mailto:jupjup@d-t-it.com)으로 메일을 보내거나, [github.com/nemodleo/jupjup](https://github.com/nemodleo/jupjup/issues)에 이슈를 남겨 주세요.

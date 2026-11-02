@@ -10,7 +10,7 @@ BUILD="${TMPDIR:-/tmp}/jupjup-build"   # iCloud 폴더 밖에서 빌드 (codesig
 xcodegen generate --quiet
 xcodebuild -project Jupjup.xcodeproj -scheme Jupjup -configuration Release -derivedDataPath "$BUILD" \
   -destination 'generic/platform=macOS' \
-  JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" -quiet build
+  JJ_SENTRY_DSN="${JJ_SENTRY_DSN:-}" JJ_TELEMETRY_APP_ID="${JJ_TELEMETRY_APP_ID:-}" JJ_CONTACT="$(head -1 CONTACT)" -quiet build
 APP="$BUILD/Build/Products/Release/Jupjup.app"
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist")
 mkdir -p build

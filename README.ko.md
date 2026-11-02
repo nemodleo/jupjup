@@ -135,6 +135,10 @@ Xcode가 필요해요(26.3에서 확인). 첫 빌드는 Swift 패키지 두 개�
 - [x] 복사 기록
 - [ ] 맥 앱스토어
 
+## 연락
+
+질문이나 개인정보 관련 요청은 [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com)으로 보내 주세요. 버그와 아이디어는 [이슈](https://github.com/nemodleo/jupjup/issues)로도 좋아요.
+
 ## 기여하기
 
 이슈와 풀 리퀘스트를 환영해요.
