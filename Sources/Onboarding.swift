@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 // 첫 실행 안내 창(디자인 캔버스 9번). 할 일은 둘: 단축키 확인, 화면 기록 권한.
@@ -96,6 +97,7 @@ struct OnboardingView: View {
 
     @ObservedObject var model: OnboardingModel
     @ObservedObject var settings: Settings
+    @State private var login = SMAppService.mainApp.status == .enabled
     let actions: Actions
 
     private var ready: Bool { model.permission && !model.conflict }
@@ -150,8 +152,22 @@ struct OnboardingView: View {
                 }
             }
 
-            // 3 · 오류·사용 통계 (기본 켬, 체크를 눌러 끔)
-            step(mark: .check(settings.reports), title: t.obReports, body: t.obReportsBody, toggle: { settings.reports.toggle() }) {
+            // 고르기: 위 둘은 할 일, 아래 둘은 고를 것. 체크가 비어도 덜 끝난 게 아니다
+            Text(t.obChoose).font(.system(size: 10)).tracking(settings.language.isRTL ? 0 : 1.6).foregroundStyle(Color.inkFaint)
+                .padding(.top, 10).padding(.bottom, 2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(alignment: .top) { Rectangle().fill(Color.inkRule).frame(height: 1) }
+
+            // 3 · 맥을 켜면 함께 열기 (첫 실행에 켜 두고, 여기서 보이게)
+            step(mark: .check(login), title: t.openAtLogin, body: t.obLoginBody, rule: false, toggle: {
+                try? login ? SMAppService.mainApp.unregister() : SMAppService.mainApp.register()
+                login = SMAppService.mainApp.status == .enabled
+            }) {
+                Text(login ? t.obReportsOn : t.obReportsOff).font(.system(size: 12)).foregroundStyle(Color.inkFaint)
+            } sub: { EmptyView() }
+
+            // 4 · 오류·사용 통계 (기본 끔, 체크를 눌러 켬)
+            step(mark: .check(settings.reports), title: t.obReports, body: t.obReportsBody, rule: false, toggle: { settings.reports.toggle() }) {
                 Text(settings.reports ? t.obReportsOn : t.obReportsOff).font(.system(size: 12)).foregroundStyle(Color.inkFaint)
             } sub: { EmptyView() }
 
@@ -167,15 +183,16 @@ struct OnboardingView: View {
         .padding(EdgeInsets(top: 26, leading: 24, bottom: 20, trailing: 24))
         .frame(width: 400)
         .background(Color.inkPanel)
+        .onAppear { login = SMAppService.mainApp.status == .enabled }
         .environment(\.layoutDirection, settings.language.isRTL ? .rightToLeft : .leftToRight)
     }
 
     enum Mark { case check(Bool), warn }
 
-    private func step<R: View, S: View>(mark: Mark, title: String, body: String, toggle: (() -> Void)? = nil,
+    private func step<R: View, S: View>(mark: Mark, title: String, body: String, rule: Bool = true, toggle: (() -> Void)? = nil,
                                         @ViewBuilder right: () -> R, @ViewBuilder sub: () -> S) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            // 누를 수 있는 건 3단계(리포트)뿐. disabled로 두면 흐려지므로 hit test만 막는다
+            // 누를 수 있는 건 고르기 두 줄뿐. disabled로 두면 흐려지므로 hit test만 막는다
             Button { toggle?() } label: { markView(mark).padding(.top, 1).contentShape(Rectangle()) }
                 .buttonStyle(.plain)
                 .allowsHitTesting(toggle != nil)
@@ -191,8 +208,8 @@ struct OnboardingView: View {
                 sub()
             }
         }
-        .padding(.vertical, 12)
-        .overlay(alignment: .top) { Rectangle().fill(Color.inkRule).frame(height: 1) }
+        .padding(.vertical, rule ? 12 : 7)
+        .overlay(alignment: .top) { if rule { Rectangle().fill(Color.inkRule).frame(height: 1) } }
     }
 
     @ViewBuilder private func markView(_ m: Mark) -> some View {
