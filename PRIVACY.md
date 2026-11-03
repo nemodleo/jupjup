@@ -11,7 +11,7 @@ Jupjup reads text on your screen **on your Mac** and never uploads or logs what 
 - When you press the shortcut, Jupjup takes a picture of the screen you selected, recognizes the text with Apple's on-device Vision or Live Text engines, and puts the text on your clipboard.
 - The picture exists in memory only for that one capture and is discarded afterwards. It is never written to disk, never uploaded, never logged.
 - The recognized text goes to your clipboard and nowhere else. The *Undo* button keeps a copy of your *previous* clipboard in memory until the notification closes, so it can be restored.
-- **History**: the last 20 texts you copied with Jupjup are saved on your Mac only, in `~/Library/Application Support/Jupjup/history.json` (readable by your user account only), so you can copy them again from the menu. Never images, never uploaded. Turn off *Keep History* in the History page to stop saving and delete what is there; *Clear History* deletes it any time.
+- **History**: the last 20 texts you copied with Jupjup are saved on your Mac only, in `~/Library/Application Support/Jupjup/history.json` (readable by your user account only), so you can copy them again from the menu. Never images, never uploaded. Sign-in codes (results that are only 4–8 digits) are never saved, the file is excluded from Time Machine backups, and the menu shows only how many items there are, not their text. Turn off *Keep History* in the History page to stop saving and delete what is there; *Clear History* deletes it any time, and hovering an item lets you delete just that one.
 - Jupjup has no account and no server of its own. It uses the network for two things only: the optional reports described below, and the update check.
 
 ## Update check
@@ -67,7 +67,7 @@ If Jupjup is built from source without report keys (`report.env`), the reporting
 ## Permissions
 
 - **Screen Recording** — required to see the screen you select. macOS asks you for it on first use; you can revoke it any time in *System Settings › Privacy & Security › Screen & System Audio Recording*.
-- **Open at Login** — Jupjup registers itself as a login item on first run so the shortcut is always available. Turn it off in the menu.
+- **Open at Login** — Jupjup registers itself as a login item on first run so the shortcut is always available. The first-run window shows this with a checkbox; turn it off there or in the menu.
 
 ## Children
 
@@ -96,7 +96,7 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 - 단축키를 누르면 줍줍이 고른 영역의 화면 이미지를 찍고, 애플의 기기 안 인식 엔진(Vision 또는 라이브 텍스트)으로 글자를 읽어 클립보드에 담아요.
 - 이미지는 그 한 번의 캡쳐 동안만 메모리에 있다가 버려져요. 디스크에 쓰지 않고, 올리지 않고, 기록하지 않아요.
 - 읽은 글자는 클립보드로만 가요. *되돌리기* 버튼을 위해 **줍기 전** 클립보드 내용을 알림이 닫힐 때까지 메모리에 잠깐 들고 있어요.
-- **복사 기록**: 줍줍으로 담은 글 최근 20개를 이 맥에만 저장해요(`~/Library/Application Support/Jupjup/history.json`, 내 계정만 읽기). 메뉴에서 다시 담을 수 있게 하려는 거예요. 이미지는 저장하지 않고, 어디로도 보내지 않아요. 기록 화면의 *기록 남기기*를 끄면 저장을 멈추고 있던 기록도 지워요. *기록 모두 지우기*로 언제든 지울 수 있어요.
+- **복사 기록**: 줍줍으로 담은 글 최근 20개를 이 맥에만 저장해요(`~/Library/Application Support/Jupjup/history.json`, 내 계정만 읽기). 메뉴에서 다시 담을 수 있게 하려는 거예요. 이미지는 저장하지 않고, 어디로도 보내지 않아요. 인증번호(숫자 4~8자리뿐인 결과)는 저장하지 않고, 파일은 Time Machine 백업에서 빼며, 메뉴에는 글 대신 개수만 보여요. 기록 화면의 *기록 남기기*를 끄면 저장을 멈추고 있던 기록도 지워요. *기록 모두 지우기*로 언제든 지울 수 있고, 기록에 마우스를 올리면 하나씩 지울 수도 있어요.
 - 줍줍에는 계정도 자체 서버도 없어요. 네트워크는 두 가지에만 써요: 아래 선택적 리포트, 그리고 새 버전 확인.
 
 ## 새 버전 확인
@@ -152,7 +152,7 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 ## 권한
 
 - **화면 기록** — 고른 화면을 보려면 필요해요. 처음 쓸 때 macOS가 물어보고, *시스템 설정 › 개인정보 보호 및 보안 › 화면 및 시스템 오디오 녹음*에서 언제든 끌 수 있어요.
-- **맥을 켜면 함께 열기** — 단축키를 늘 쓸 수 있게 첫 실행 때 로그인 항목으로 등록해요. 메뉴에서 끌 수 있어요.
+- **맥을 켜면 함께 열기** — 단축키를 늘 쓸 수 있게 첫 실행 때 로그인 항목으로 등록해요. 첫 실행 창에 체크로 보여 주니 그 자리나 메뉴에서 끌 수 있어요.
 
 ## 아동
 
