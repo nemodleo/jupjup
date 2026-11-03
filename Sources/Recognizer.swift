@@ -195,16 +195,18 @@ enum Recognizer {
     }
 
     /// 인증번호처럼 자간을 넓힌 숫자는 Vision이 "4829 1 3"처럼 아무 데나 띄어 읽는다.
-    /// 한 줄이 숫자와 띄어쓰기뿐이고, 숫자가 4~8개이며, 한 자리짜리 덩이가 섞여 있으면 붙인다.
-    /// 전화번호 "010 1234 5678"이나 카드 번호처럼 덩이가 고른 숫자는 건드리지 않는다.
+    /// 한 줄이 숫자와 띄어쓰기뿐이고, 숫자가 인증번호 길이(4·6·8개)이며, 한 자리짜리 덩이가 섞여 있으면 붙인다.
+    /// 전화번호 "010 1234 5678"이나 카드 번호처럼 덩이가 고른 숫자, 쪽 번호 "1 2 3 4 5",
+    /// 연도로 시작하는 날짜 "2026 1 3"은 건드리지 않는다.
     static func tidyDigits(_ r: Recognized) -> Recognized {
         var out = r
         out.lines = r.lines.map { line in
             let text = line.map(\.text).joined(separator: " ").trimmingCharacters(in: .whitespaces)
             let groups = text.split(separator: " ")
             let digits = text.filter(\.isNumber)
-            guard groups.count > 1, digits.count == text.filter({ $0 != " " }).count, (4...8).contains(digits.count),
-                  digits.allSatisfy(\.isASCII), groups.contains(where: { $0.count == 1 }) else { return line }
+            guard groups.count > 1, digits.count == text.filter({ $0 != " " }).count, [4, 6, 8].contains(digits.count),
+                  digits.allSatisfy(\.isASCII), groups.contains(where: { $0.count == 1 }),
+                  !(groups[0].count == 4 && (groups[0].hasPrefix("19") || groups[0].hasPrefix("20"))) else { return line }
             let rect = line.map(\.rect).reduce(line[0].rect) { $0.union($1) }
             return [Piece(rect: rect, text: digits)]
         }
