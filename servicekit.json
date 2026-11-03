@@ -163,6 +163,38 @@
       "modules": [
         "공통 규칙"
       ]
+    },
+    "a3835b9": {
+      "decision": "skip",
+      "why": "팀 저장소 지침 — 줍줍은 개인 저장소",
+      "date": "2026-11-03",
+      "modules": [
+        "공통 규칙"
+      ]
+    },
+    "19f12af": {
+      "decision": "skip",
+      "why": "PR 검사 한 줄 — 줍줍은 PR 없이 작업",
+      "date": "2026-11-03",
+      "modules": [
+        "design"
+      ]
+    },
+    "a8c831c": {
+      "decision": "skip",
+      "why": "웹 분석 규칙 — 맥 앱",
+      "date": "2026-11-03",
+      "modules": [
+        "analytics"
+      ]
+    },
+    "53a98d9": {
+      "decision": "skip",
+      "why": "도메인은 사이트 쪽(jupjup-web) 기록",
+      "date": "2026-11-03",
+      "modules": [
+        "공통 규칙"
+      ]
     }
   }
 }
