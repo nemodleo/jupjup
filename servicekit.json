@@ -1,0 +1,13 @@
+{
+  "_": "servicekit(~/.claude/skills/servicekit) 설정. 사이트 쪽은 nemodleo/jupjup-web 의 servicekit.json",
+  "name": {"ko": "줍줍", "en": "Jupjup"},
+  "site": "https://jupjup.d-t-it.com/",
+  "contact": "file:CONTACT",
+  "langs": ["ko", "en"],
+  "modules": {
+    "contact": {"file": "CONTACT", "set": "make contact EMAIL=…"},
+    "release": {"site_repo": "nemodleo/jupjup-web", "notes": "docs/releases/<버전>.md", "client": "Sources/Update.swift"},
+    "privacy": {"file": "PRIVACY.md", "sections": ["local-history", "update-check", "reports"]},
+    "analytics": {"file": "Sources/Reporting.swift", "sentry": true, "telemetrydeck": true, "default_on": true}
+  }
+}
