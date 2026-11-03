@@ -209,6 +209,12 @@
       "why": "repo 모듈(Makefile 입구는 있음, spec.md·tasks.md 없음) — 다음에 줍줍을 열 때 붙일지 정함(사용자 결정)",
       "date": "2026-11-03",
       "modules": []
+    },
+    "1db4310": {
+      "decision": "hold",
+      "why": "repo 모듈 보류와 같은 묶음(사용자 결정 보류 유지)",
+      "date": "2026-11-03",
+      "modules": []
     }
   }
 }
