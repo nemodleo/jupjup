@@ -206,7 +206,7 @@ final class Settings: ObservableObject {
     @Published var shortcutNote: String?
 
     private init() {
-        d.register(defaults: ["joinLines": false, "tables": true, "reports": true, "updateCheck": true, "history": true,
+        d.register(defaults: ["joinLines": false, "tables": true, "reports": false, "updateCheck": true, "history": true,
                               // 노치 뒤로 숨지 않게 오른쪽 끝 가까이 둔다(우연·묵묵과 같은 방법)
                               "NSStatusItem Preferred Position jupjup": 360])
         joinLines = d.bool(forKey: "joinLines")

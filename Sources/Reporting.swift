@@ -3,7 +3,7 @@ import Sentry
 import TelemetryDeck
 
 // 리포트: 오류는 Sentry, 횟수는 TelemetryDeck. 글 내용·화면·좌표는 절대 보내지 않는다.
-// 설정 '오류·사용 통계 보내기'(기본 켬)를 끄면 아무것도 보내지 않는다.
+// 설정 '오류·사용 통계 보내기'는 기본 끔. 사용자가 켜기 전에는 SDK를 시작하지도 않는다.
 // 키는 Info.plist(JJSentryDSN, JJTelemetryAppID)에서 읽고, 비어 있으면 그 쪽은 조용히 꺼진다.
 
 @MainActor
@@ -43,6 +43,7 @@ enum Reporting {
     static func stop() {
         guard started else { return }
         if !sentryDSN.isEmpty { SentrySDK.close() }
+        if !telemetryAppID.isEmpty { TelemetryDeck.terminate() } // 쌓아 둔 신호도 버린다
         started = false
     }
 
