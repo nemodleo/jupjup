@@ -137,7 +137,7 @@ Once a day Jupjup also checks `jupjup.d-t-it.com/version.json` for a newer versi
 
 ## Contact
 
-[jupjup@d-t-it.com](mailto:jupjup@d-t-it.com) for questions and privacy requests. Bugs and ideas are welcome as [issues](https://github.com/nemodleo/jupjup/issues).
+[jupjup@d-t-it.com](mailto:jupjup@d-t-it.com) for questions and privacy requests, in English or Korean. Bugs and ideas are welcome as [issues](https://github.com/nemodleo/jupjup/issues).
 
 ## Contributing
 
