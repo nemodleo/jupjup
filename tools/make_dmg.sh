@@ -19,9 +19,12 @@ DMG="build/Jupjup-$VERSION.dmg"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
 cp -R "$APP" "$STAGE/"
-if security find-identity -v -p codesigning 2>/dev/null | grep -q '"Jupjup Dev"'; then
-  codesign --force --deep --sign "Jupjup Dev" --preserve-metadata=entitlements,flags "$STAGE/Jupjup.app"
+# 서명이 바뀌면 모든 사용자의 화면 기록 권한이 풀린다. 인증서가 없으면 애드혹으로 넘어가지 말고 멈춘다
+if ! security find-identity -v -p codesigning 2>/dev/null | grep -q '"Jupjup Dev"'; then
+  echo "✗ 'Jupjup Dev' 인증서가 키체인에 없어요. 백업한 p12를 가져오세요(새로 만들면 사용자 권한이 풀려요)." >&2
+  exit 1
 fi
+codesign --force --deep --sign "Jupjup Dev" --preserve-metadata=entitlements,flags "$STAGE/Jupjup.app"
 codesign --verify --deep --strict "$STAGE/Jupjup.app"
 ln -s /Applications "$STAGE/Applications"
 cp LICENSE "$STAGE/LICENSE.txt"
