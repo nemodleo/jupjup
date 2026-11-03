@@ -38,10 +38,22 @@ final class UpdateChecker {
         Task {
             guard let (data, resp) = try? await Self.session.data(from: url) else { return }
             if let http = resp as? HTTPURLResponse, http.statusCode != 200 { return }
-            guard let f = try? JSONDecoder().decode(Feed.self, from: data), let link = URL(string: f.url) else { return }
+            guard let f = try? JSONDecoder().decode(Feed.self, from: data), let link = URL(string: f.url),
+                  Self.trusted(link) else { return }
             let newer = Self.isNewer(f.version, than: mine)
             if newer, Settings.shared.update?.version != f.version { Reporting.signal("update.available", ["version": f.version]) }
             Settings.shared.update = newer ? .init(version: f.version, url: link) : nil
+        }
+    }
+
+    /// 내려받기 주소는 소개 사이트의 /download/(GitHub 릴리스로 넘김)와 GitHub 릴리스만 연다.
+    /// version.json이 바뀌어도 다른 곳으로 보내지 못하게
+    nonisolated static func trusted(_ url: URL) -> Bool {
+        guard url.scheme == "https", url.user == nil, url.port == nil else { return false }
+        switch url.host {
+        case "jupjup.d-t-it.com": return url.path.hasPrefix("/download/")
+        case "github.com": return url.path.hasPrefix("/nemodleo/jupjup/releases/")
+        default: return false
         }
     }
 
