@@ -1,10 +1,10 @@
 # Privacy Policy · 개인정보 처리방침
 
-*Last updated: 2026-11-02 · [한국어](#한국어)*
+*Last updated: 2026-11-03 · [한국어](#한국어)*
 
 ## In one sentence
 
-Jupjup reads text on your screen **on your Mac** and never uploads or logs what it reads. The only copy it keeps is a short local history on your Mac, which you can turn off. The only thing that can leave your Mac is an optional, anonymous count of how the app is used and whether it crashed — and you can turn that off with one click.
+Jupjup reads text on your screen **on your Mac** and never uploads or logs what it reads. The only copy it keeps is a short local history on your Mac, which you can turn off. The only thing that can leave your Mac is an optional, anonymous count of how the app is used and whether it crashed — off unless you turn it on.
 
 ## What Jupjup does with your screen
 
@@ -20,7 +20,7 @@ Once at launch and once a day, Jupjup downloads `https://jupjup.d-t-it.com/versi
 
 ## Optional error & usage reports
 
-Jupjup can send anonymous reports to two services. This is **on by default** and shown on the first-run screen. You can turn it off at any time in the menu (*Send Error & Usage Reports*) or on the first-run screen. When it is off, nothing is sent.
+Jupjup can send anonymous reports to two services. This is **off by default**: the reporting libraries do not even start until you turn it on, on the first-run screen or in the menu (*Send Error & Usage Reports*). Turning it off stops both and drops anything not yet sent.
 
 ### What is sent
 
@@ -33,10 +33,16 @@ Only **counts and categories**. Examples of real signals:
 | `capture.empty` / `capture.cancelled` | mode |
 | `toast.undo` / `toast.edit` / `toast.table` / `toast.join` | which button was used |
 | `mode.changed` / `language.changed` / `shortcut.changed` | the new mode or language (not the shortcut keys) |
+| `toast.open` / `toast.retryAccurate` / `toast.sameSpot` | which button was used |
+| `history.recalled` / `history.cleared` | that a history item was copied again or the history was cleared |
+| `update.available` / `update.clicked` | the new version number |
 | `onboarding.shown` / `onboarding.done` | whether screen permission was granted |
+| `report.test` | sent only when the developer runs `Jupjup -reporttest` |
+| app session (Sentry) | that the app ran and whether it ended in a crash |
+| `capture.failed` (Sentry) | that screen capture failed, and the kind of error |
 | crash report | the type of crash and the code location inside Jupjup (stack trace), app version, macOS version, Mac model |
 
-The complete list is in [`Sources/Reporting.swift`](Sources/Reporting.swift).
+That is the complete list. Signals are sent with `Reporting.signal` / `Reporting.error` ([`Sources/Reporting.swift`](Sources/Reporting.swift)); search for those to check.
 
 ### What is never sent
 
@@ -79,11 +85,11 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 
 # 한국어
 
-*마지막 수정: 2026-11-01*
+*마지막 수정: 2026-11-03*
 
 ## 한 문장으로
 
-줍줍은 화면의 글자를 **맥 안에서** 읽고, 읽은 내용을 올리거나 로그로 남기지 않아요. 남는 건 이 맥 안의 짧은 복사 기록뿐이고, 그것도 끌 수 있어요. 맥 밖으로 나갈 수 있는 건 "앱을 어떻게 썼는지, 죽었는지"의 익명 횟수뿐이고, 그것도 한 번의 클릭으로 끌 수 있어요.
+줍줍은 화면의 글자를 **맥 안에서** 읽고, 읽은 내용을 올리거나 로그로 남기지 않아요. 남는 건 이 맥 안의 짧은 복사 기록뿐이고, 그것도 끌 수 있어요. 맥 밖으로 나갈 수 있는 건 "앱을 어떻게 썼는지, 죽었는지"의 익명 횟수뿐이고, 그것도 직접 켜지 않으면 보내지 않아요.
 
 ## 화면을 어떻게 다루나요
 
@@ -99,7 +105,7 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 
 ## 선택적 오류·사용 통계
 
-줍줍은 익명 리포트를 두 서비스에 보낼 수 있어요. **기본값은 켬**이고 첫 실행 화면에서 보여 줘요. 메뉴의 *오류·사용 통계 보내기*나 첫 실행 화면에서 언제든 끌 수 있어요. 끄면 아무것도 보내지 않아요.
+줍줍은 익명 리포트를 두 서비스에 보낼 수 있어요. **기본값은 끔**이에요. 첫 실행 화면이나 메뉴의 *오류·사용 통계 보내기*에서 켜기 전에는 리포트 라이브러리를 시작하지도 않아요. 끄면 둘 다 멈추고 아직 안 보낸 것도 버려요.
 
 ### 보내는 것
 
@@ -112,10 +118,16 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 | `capture.empty` / `capture.cancelled` | 모드 |
 | `toast.undo` / `toast.edit` / `toast.table` / `toast.join` | 어떤 버튼을 눌렀는지 |
 | `mode.changed` / `language.changed` / `shortcut.changed` | 바뀐 모드나 언어 (단축키 조합은 보내지 않음) |
+| `toast.open` / `toast.retryAccurate` / `toast.sameSpot` | 어떤 버튼을 눌렀는지 |
+| `history.recalled` / `history.cleared` | 기록에서 다시 담았는지, 기록을 지웠는지 |
+| `update.available` / `update.clicked` | 새 버전 번호 |
 | `onboarding.shown` / `onboarding.done` | 화면 권한을 켰는지 |
+| `report.test` | 개발자가 `Jupjup -reporttest`로 시험할 때만 |
+| 앱 세션 (Sentry) | 앱이 켜졌는지, 죽으며 끝났는지 |
+| `capture.failed` (Sentry) | 화면 캡쳐가 실패했다는 것과 오류 종류 |
 | 오류 보고 | 오류 종류와 줍줍 코드 안의 위치(스택 트레이스), 앱 버전, macOS 버전, 맥 모델 |
 
-전체 목록은 [`Sources/Reporting.swift`](Sources/Reporting.swift)에 있어요.
+이게 전부예요. 신호는 `Reporting.signal`·`Reporting.error`([`Sources/Reporting.swift`](Sources/Reporting.swift))로만 보내니, 그 이름으로 찾아 확인할 수 있어요.
 
 ### 절대 보내지 않는 것
 

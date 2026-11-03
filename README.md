@@ -28,10 +28,10 @@
 
 ## Why Jupjup?
 
-There are plenty of screen-OCR tools. Jupjup does three things they don't:
+There are plenty of screen-OCR tools — TextSniper, Shottr, TRex, and Live Text built into macOS. Jupjup is free and open source, and it is built around three things:
 
 - **Tables stay tables.** Select a table on screen and paste it into Numbers, Excel or Google Sheets with the cells intact. Jupjup puts both tab-separated text and an HTML table on the clipboard. 98% cell accuracy on our HTML-table benchmark (`tools/table_bench.swift`).
-- **Reads any script without setup.** Korean, Japanese, Chinese, Cyrillic, Thai, Arabic, Vietnamese… Jupjup reads in your languages first and, if that fails, tries the other scripts automatically. 97–100% on 12 languages in our tests.
+- **Mixed scripts, no setup.** Live Text and most OCR tools read with one language at a time. Korean, Japanese, Chinese, Cyrillic, Thai, Arabic, Vietnamese… Jupjup reads in your languages first and, if that fails, tries the other scripts automatically. 97–100% on 12 languages in our tests.
 - **QR codes and barcodes, too.** Even styled ones (dotted, rounded, logo on top). If it is a link, the notification has an **Open** button. 46 of 47 hard cases in `tools/code_bench.swift`.
 
 <table>
@@ -42,7 +42,7 @@ There are plenty of screen-OCR tools. Jupjup does three things they don't:
   </tr>
 </table>
 
-Everything runs on your Mac. No account, no server, nothing leaves the machine unless you keep the optional, counts-only crash/usage reports on.
+Everything runs on your Mac. No account, no server, nothing leaves the machine unless you turn on the optional, counts-only crash/usage reports (off by default).
 
 ## Features
 
@@ -68,7 +68,9 @@ Everything runs on your Mac. No account, no server, nothing leaves the machine u
 
 Jupjup is in **beta** and not yet notarized by Apple, so macOS will warn on first open.
 
-**Build from source** (recommended for now)
+**Download** (recommended) — get the DMG from [jupjup.d-t-it.com](https://jupjup.d-t-it.com) (Universal, about 5 MB). It isn’t notarized yet: on first launch, open System Settings › Privacy & Security and click *Open Anyway*. You need to do this again after each update until Jupjup is notarized. The disk image includes the steps. Make your own with `make dmg`.
+
+**Build from source** (for contributors)
 
 ```bash
 brew install xcodegen          # once
@@ -80,8 +82,6 @@ make build                     # builds a Universal app, installs to /Applicatio
 Requires Xcode (tested with 26.3). The first build downloads two Swift packages and takes a few minutes.
 
 > If you rebuild often, run `make cert` once. It creates a self-signed certificate ("Jupjup Dev") that `build.sh` then signs with, so macOS keeps the Screen Recording permission across rebuilds. Ad-hoc signatures change on every build, which makes macOS ask again each time.
-
-**Download** — get the DMG from [jupjup.d-t-it.com](https://jupjup.d-t-it.com) (Universal, about 5 MB). It isn’t notarized yet: on first launch, open System Settings › Privacy & Security and click *Open Anyway*. The disk image includes the steps. Make your own with `make dmg`.
 
 ### First launch
 
@@ -118,7 +118,7 @@ Jupjup never uploads or logs what it reads. Screenshots live in memory for the d
 
 Full policy: [PRIVACY.md](PRIVACY.md).
 
-Optional **error & usage reports** (on by default, one click to turn off in the menu or the first-run window) send only *counts and categories* — "a capture finished, 2–5 lines, under a second, table: no" — to [Sentry](https://sentry.io) (crashes) and [TelemetryDeck](https://telemetrydeck.com) (usage). Never text, never images, never coordinates. The exact list is in `Sources/Reporting.swift`. Builds without report keys send nothing at all.
+Optional **error & usage reports** (off by default; turn on in the first-run window or the menu) send only *counts and categories* — "a capture finished, 2–5 lines, under a second, table: no" — to [Sentry](https://sentry.io) (crashes) and [TelemetryDeck](https://telemetrydeck.com) (usage). Never text, never images, never coordinates. The exact list is in `Sources/Reporting.swift`. Builds without report keys send nothing at all.
 
 Once a day Jupjup also checks `jupjup.d-t-it.com/version.json` for a newer version (no cookies, no identifiers; turn off with *Check for Updates*). It only tells you in the menu; it never installs anything by itself.
 
@@ -130,7 +130,7 @@ Once a day Jupjup also checks `jupjup.d-t-it.com/version.json` for a newer versi
 ## Roadmap
 
 - [ ] Developer ID signing and notarization (no more Gatekeeper warning)
-- [ ] Downloadable releases and in-app updates
+- [x] Downloadable releases and update notices
 - [ ] Native-speaker review of the 31 machine-translated interface languages
 - [x] Capture history
 - [ ] Mac App Store
