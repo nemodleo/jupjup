@@ -116,7 +116,7 @@
       "where": "사이트 저장소 nemodleo/jupjup-web 의 email/(brand.json·samples.json)"
     }
   },
-  "servicekit_version": "e282829",
+  "servicekit_version": "5701255",
   "decisions": {
     "aae098f": {
       "decision": "skip",
@@ -147,6 +147,14 @@
       "decision": "skip",
       "why": "web/엔 내보낼 파일만 있음(확인), 앱은 이미 -snapshot으로 보드를 찍음",
       "date": "2026-11-03"
+    },
+    "7ea961e": {
+      "decision": "apply",
+      "why": "차용 기록 형식 — 이 세션에서 servicekit.json에 채움(check 다 참)",
+      "date": "2026-11-03",
+      "modules": [
+        "공통 규칙"
+      ]
     }
   }
 }
