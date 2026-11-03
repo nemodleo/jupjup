@@ -83,6 +83,9 @@
  "historyOff": "इतिहास बंद है",
  "historyKeep": "इतिहास रखें",
  "historyClear": "इतिहास साफ़ करें",
- "historyNote": "आख़िरी 20 सिर्फ़ इसी Mac पर रहते हैं।",
- "historyTable": "तालिका"
+ "historyNote": "आख़िरी 20, सिर्फ़ इसी Mac पर। साइन-इन कोड कभी नहीं रखे जाते, और कुछ भी बैकअप में नहीं जाता।",
+ "historyTable": "तालिका",
+ "historyNoKeep": "नहीं रखा गया",
+ "historyDelete": "यह आइटम हटाएँ",
+ "historyOffShort": "बंद"
 }

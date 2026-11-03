@@ -83,6 +83,9 @@
  "historyOff": "Historik är av",
  "historyKeep": "Spara historik",
  "historyClear": "Rensa historik",
- "historyNote": "De senaste 20 stannar bara på den här Macen.",
- "historyTable": "Tabell"
+ "historyNote": "De senaste 20, bara på den här Macen. Inloggningskoder sparas aldrig och inget hamnar i säkerhetskopior.",
+ "historyTable": "Tabell",
+ "historyNoKeep": "Sparas inte",
+ "historyDelete": "Radera det här",
+ "historyOffShort": "Av"
 }

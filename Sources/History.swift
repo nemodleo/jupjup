@@ -3,6 +3,7 @@ import SwiftUI
 // 복사 기록. 주운 글을 최근 20개까지 이 맥에만 둔다(~/Library/Application Support/Jupjup/history.json, 나만 읽기).
 // 어디로도 보내지 않는다. 메뉴 "기록"에서 다시 누르면 그때 담았던 모양(한 줄·표·고친 글) 그대로 클립보드에.
 // 알림에서 모양을 바꾸면 같은 기록이 고쳐지고, 되돌리기를 누르면 그 기록은 지운다.
+// 인증번호(숫자 4~8자리뿐)는 남기지 않고, 파일은 Time Machine 백업에서 뺀다.
 
 struct HistoryEntry: Codable, Identifiable, Equatable {
     var id: UUID
@@ -64,12 +65,13 @@ final class History: ObservableObject {
     private init() {
         guard Settings.shared.history, let data = try? Data(contentsOf: file),
               let saved = try? JSONDecoder().decode([HistoryEntry].self, from: data) else { return }
-        entries = Array(saved.prefix(Self.limit))
+        entries = Array(saved.filter { !Self.isCode($0.copied) }.prefix(Self.limit)) // 1.2까지 남은 인증번호는 버림
     }
 
     /// 알림이 클립보드에 쓸 때마다: 같은 id면 고치고 맨 위로, 없으면 새로
     func put(_ id: UUID, model m: ToastModel) {
         guard Settings.shared.history, !m.copiedText.isEmpty else { return }
+        guard !Self.isCode(m.copiedText) else { return remove(id) } // 고쳐서 인증번호가 됐으면 있던 것도 지움
         let r = m.result
         let e = HistoryEntry(id: id, date: entries.first { $0.id == id }?.date ?? Date(),
                              lines: r.lines.map { $0.map(\.text).joined(separator: " ") }, table: r.table?.rows,
@@ -81,7 +83,14 @@ final class History: ObservableObject {
         save()
     }
 
+    /// 인증번호로 볼 글: 띄어쓰기를 빼면 ASCII 숫자 4~8자리뿐
+    nonisolated static func isCode(_ s: String) -> Bool {
+        let d = s.filter { !$0.isWhitespace }
+        return (4...8).contains(d.count) && d.allSatisfy { $0.isASCII && $0.isNumber }
+    }
+
     func remove(_ id: UUID) {
+        guard entries.contains(where: { $0.id == id }) else { return }
         entries.removeAll { $0.id == id }
         save()
     }
@@ -99,6 +108,9 @@ final class History: ObservableObject {
                                                  attributes: [.posixPermissions: 0o700])
         try? data.write(to: file, options: .atomic)
         try? FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: file.path)
+        var url = file, values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try? url.setResourceValues(values)
     }
 }
 
@@ -122,6 +134,9 @@ extension History {
         check(h.entries.count == 1, "같은 글은 하나만")
         for i in 0..<25 { let x = ToastModel(); x.result = Recognized(lines: [[Piece(rect: .zero, text: "글 \(i)")]], table: nil); h.put(UUID(), model: x) }
         check(h.entries.count == limit && h.entries[0].copied == "글 24", "20개까지, 최근 것이 위")
+        let code = ToastModel(); code.result = Recognized(lines: [[Piece(rect: .zero, text: "482913")]], table: nil)
+        let before = h.entries.count; h.put(UUID(), model: code)
+        check(h.entries.count == before && isCode("4829 1 3") && !isCode("010 1234 5678") && !isCode("A1B2C3"), "인증번호는 안 남김")
         let top = h.entries[0].id; h.remove(top)
         check(!h.entries.contains { $0.id == top }, "되돌리면 지움")
         let e = HistoryEntry(id: UUID(), date: Date(), lines: lines, table: [["a", "b"]], codes: [.init(payload: "https://x.y", isQR: true)],
@@ -159,7 +174,7 @@ struct HistoryPage: View {
                     .frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 22)
             } else {
                 let list = VStack(alignment: .leading, spacing: 0) {
-                    ForEach(history.entries) { e in HistoryRow(entry: e) { pick(e) } }
+                    ForEach(history.entries) { e in HistoryRow(entry: e, action: { pick(e) }, delete: { history.remove(e.id) }) }
                 }
                 // 여덟 개까지는 그대로, 넘으면 그 높이에서 굴린다
                 if history.entries.count <= 8 { list } else { ScrollView(.vertical) { list }.frame(height: 42 * 8) }
@@ -188,9 +203,29 @@ struct HistoryPage: View {
 struct HistoryRow: View {
     let entry: HistoryEntry
     let action: () -> Void
+    var delete: () -> Void = {}
     @State private var over = false
 
     var body: some View {
+        // 올렸을 때만 오른쪽에 ×(하나씩 지우기)
+        ZStack(alignment: .trailing) {
+            row
+            if over {
+                Button(action: delete) {
+                    Image(systemName: "xmark").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.inkText)
+                        .frame(width: 22, height: 22)
+                        .background(RoundedRectangle(cornerRadius: 5).fill(Color.inkFill.opacity(1.5)))
+                        .frame(width: 34, height: 42).contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(L.s.historyDelete)
+                .accessibilityLabel(L.s.historyDelete)
+            }
+        }
+        .onHover { over = $0 }
+    }
+
+    private var row: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.title).font(Fonts.font(12.5)).foregroundStyle(over ? Color.inkText : Color.inkSub)
@@ -201,13 +236,12 @@ struct HistoryRow: View {
                 }
                 .font(.system(size: 10.5)).foregroundStyle(Color.inkFaint).lineLimit(1)
             }
-            .padding(.horizontal, 8).frame(height: 42, alignment: .leading)
+            .padding(.leading, 8).padding(.trailing, over ? 34 : 8).frame(height: 42, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(RoundedRectangle(cornerRadius: 6).fill(over ? Color.inkFill : .clear))
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .onHover { over = $0 }
         .help(String(entry.copied.prefix(400)))
     }
 

@@ -83,6 +83,9 @@
  "historyOff": "Historikk er av",
  "historyKeep": "Behold historikk",
  "historyClear": "Tøm historikk",
- "historyNote": "De siste 20 blir bare på denne Macen.",
- "historyTable": "Tabell"
+ "historyNote": "De siste 20, bare på denne Macen. Innloggingskoder lagres aldri, og ingenting havner i sikkerhetskopier.",
+ "historyTable": "Tabell",
+ "historyNoKeep": "Lagres ikke",
+ "historyDelete": "Slett dette elementet",
+ "historyOffShort": "Av"
 }

@@ -83,6 +83,9 @@
  "historyOff": "Zgodovina je izklopljena",
  "historyKeep": "Shranjuj zgodovino",
  "historyClear": "Počisti zgodovino",
- "historyNote": "Zadnjih 20 ostane le v tem Macu.",
- "historyTable": "Tabela"
+ "historyNote": "Zadnjih 20, samo na tem Macu. Kode za prijavo se nikoli ne shranijo in nič ne gre v varnostne kopije.",
+ "historyTable": "Tabela",
+ "historyNoKeep": "Ni shranjeno",
+ "historyDelete": "Izbriši ta element",
+ "historyOffShort": "Izkl."
 }

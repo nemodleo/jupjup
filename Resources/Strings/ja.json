@@ -104,6 +104,11 @@
  "historyOff": "履歴は残していません",
  "historyKeep": "履歴を残す",
  "historyClear": "履歴をすべて消去",
- "historyNote": "最近の20件をこのMacにだけ保存します。",
- "historyTable": "表"
+ "historyNote": "最近の20件をこのMacにだけ保存します。認証コードは残さず、バックアップにも入りません。",
+ "historyTable": "表",
+ "historyNoKeep": "履歴に残さない",
+ "historyDelete": "この履歴を削除",
+ "historyOffShort": "オフ",
+ "obChoose": "選ぶ",
+ "obLoginBody": "起動していないとショートカットが効きません。メニューからも変更できます。"
 }

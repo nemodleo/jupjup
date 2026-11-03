@@ -83,6 +83,9 @@
  "historyOff": "Тарих өшірулі",
  "historyKeep": "Тарихты сақтау",
  "historyClear": "Тарихты тазалау",
- "historyNote": "Соңғы 20-сы тек осы Mac-та сақталады.",
- "historyTable": "Кесте"
+ "historyNote": "Соңғы 20, тек осы Mac-та. Кіру кодтары ешқашан сақталмайды, сақтық көшірмеге де түспейді.",
+ "historyTable": "Кесте",
+ "historyNoKeep": "Сақталмайды",
+ "historyDelete": "Бұл жазбаны жою",
+ "historyOffShort": "Өшік"
 }

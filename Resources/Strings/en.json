@@ -104,6 +104,11 @@
  "historyOff": "History is off",
  "historyKeep": "Keep History",
  "historyClear": "Clear History",
- "historyNote": "The last 20 stay on this Mac only.",
- "historyTable": "Table"
+ "historyNote": "The last 20, on this Mac only. Sign-in codes are never kept, and none of it goes into backups.",
+ "historyTable": "Table",
+ "historyNoKeep": "Not kept",
+ "historyDelete": "Delete this item",
+ "historyOffShort": "Off",
+ "obChoose": "Your choice",
+ "obLoginBody": "Jupjup has to be running for the shortcut to work. You can change this in the menu too."
 }

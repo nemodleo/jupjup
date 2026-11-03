@@ -83,6 +83,9 @@
  "historyOff": "ההיסטוריה כבויה",
  "historyKeep": "שמירת היסטוריה",
  "historyClear": "ניקוי היסטוריה",
- "historyNote": "20 האחרונים נשמרים רק במק הזה.",
- "historyTable": "טבלה"
+ "historyNote": "20 האחרונים, רק במק הזה. קודי כניסה אף פעם לא נשמרים, ושום דבר לא נכנס לגיבויים.",
+ "historyTable": "טבלה",
+ "historyNoKeep": "לא נשמר",
+ "historyDelete": "מחיקת הפריט",
+ "historyOffShort": "כבוי"
 }

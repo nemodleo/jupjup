@@ -83,6 +83,9 @@
  "historyOff": "L’historial està desactivat",
  "historyKeep": "Conserva l’historial",
  "historyClear": "Esborra l’historial",
- "historyNote": "Els últims 20 es queden només en aquest Mac.",
- "historyTable": "Taula"
+ "historyNote": "Els 20 darrers, només en aquest Mac. Els codis d’accés no es guarden mai i res no va a les còpies de seguretat.",
+ "historyTable": "Taula",
+ "historyNoKeep": "No es guarda",
+ "historyDelete": "Elimina aquest element",
+ "historyOffShort": "Desactivat"
 }

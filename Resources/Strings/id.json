@@ -83,6 +83,9 @@
  "historyOff": "Riwayat dimatikan",
  "historyKeep": "Simpan riwayat",
  "historyClear": "Hapus riwayat",
- "historyNote": "20 terakhir hanya disimpan di Mac ini.",
- "historyTable": "Tabel"
+ "historyNote": "20 terakhir, hanya di Mac ini. Kode masuk tidak pernah disimpan, dan tidak ada yang masuk ke cadangan.",
+ "historyTable": "Tabel",
+ "historyNoKeep": "Tidak disimpan",
+ "historyDelete": "Hapus item ini",
+ "historyOffShort": "Mati"
 }

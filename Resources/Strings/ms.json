@@ -83,6 +83,9 @@
  "historyOff": "Sejarah dimatikan",
  "historyKeep": "Simpan sejarah",
  "historyClear": "Kosongkan sejarah",
- "historyNote": "20 terakhir disimpan di Mac ini sahaja.",
- "historyTable": "Jadual"
+ "historyNote": "20 terakhir, hanya pada Mac ini. Kod log masuk tidak pernah disimpan dan tiada yang masuk ke sandaran.",
+ "historyTable": "Jadual",
+ "historyNoKeep": "Tidak disimpan",
+ "historyDelete": "Padam item ini",
+ "historyOffShort": "Mati"
 }

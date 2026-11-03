@@ -83,6 +83,9 @@
  "historyOff": "未保留歷史記錄",
  "historyKeep": "保留歷史記錄",
  "historyClear": "清除全部記錄",
- "historyNote": "最近 20 筆只存在這台 Mac 上。",
- "historyTable": "表格"
+ "historyNote": "最近 20 筆只存在這台 Mac。驗證碼不保留，也不會進入備份。",
+ "historyTable": "表格",
+ "historyNoKeep": "不留紀錄",
+ "historyDelete": "刪除此紀錄",
+ "historyOffShort": "關閉"
 }

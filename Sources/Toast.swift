@@ -56,6 +56,9 @@ final class ToastModel: ObservableObject {
         return joined ? result.joinedText : result.text
     }
 
+    /// 인증번호라 기록에 남기지 않는 글
+    var isCode: Bool { History.isCode(copiedText) }
+
     var meta: String {
         let t = L.s
         if edited != nil { return t.editedMeta(copiedText.count) }
@@ -96,6 +99,8 @@ final class ToastModel: ObservableObject {
         } else {
             pb.setString(copiedText, forType: .string)
         }
+        // 인증번호는 클립보드 관리 앱이 저장하지 않게 "잠깐 쓰는 값"으로 표시(nspasteboard.org 약속)
+        if isCode { pb.setData(Data(), forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType")) }
         if let entryID { History.shared.put(entryID, model: self) }
     }
 }
@@ -371,9 +376,15 @@ struct ToastView: View {
     }
 
     /// 제목 + 옅은 덧말 한 줄
-    private func title(_ t: String, _ meta: String, done: Bool = false) -> some View {
+    private func title(_ t: String, _ meta: String, done: Bool = false, tag: String? = nil) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text(t).font(Fonts.face(14)).tracking(Fonts.faceTracking(14)).foregroundStyle(done ? Color.sealText : Color.inkText)
+            if let tag {
+                // 인증번호: 왜 기록에 없는지 그 자리에서
+                Text(tag).font(.system(size: 10)).foregroundStyle(Color.inkFaint).lineLimit(1)
+                    .padding(.horizontal, 5).frame(height: 16)
+                    .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.inkRule, lineWidth: 1))
+            }
             Text(meta).font(Fonts.font(11)).foregroundStyle(Color.inkFaint).lineLimit(1)
         }
     }
@@ -381,7 +392,7 @@ struct ToastView: View {
     @ViewBuilder private var content: some View {
         switch model.kind {
         case .picked:
-            title(L.s.picked, model.meta, done: true)
+            title(L.s.picked, model.meta, done: true, tag: model.isCode && Settings.shared.history && !model.fromHistory ? L.s.historyNoKeep : nil)
             if !model.editing, model.asTable, model.edited == nil, let t = model.result.table {
                 tablePreview(t)
             } else if !model.editing {

@@ -83,6 +83,9 @@
  "historyOff": "Historia on pois päältä",
  "historyKeep": "Säilytä historia",
  "historyClear": "Tyhjennä historia",
- "historyNote": "Viimeiset 20 jäävät vain tähän Maciin.",
- "historyTable": "Taulukko"
+ "historyNote": "Viimeiset 20, vain tällä Macilla. Kirjautumiskoodeja ei koskaan tallenneta, eikä mitään mene varmuuskopioihin.",
+ "historyTable": "Taulukko",
+ "historyNoKeep": "Ei tallenneta",
+ "historyDelete": "Poista tämä",
+ "historyOffShort": "Pois"
 }

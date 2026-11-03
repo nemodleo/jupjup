@@ -83,6 +83,9 @@
  "historyOff": "Povijest je isključena",
  "historyKeep": "Čuvaj povijest",
  "historyClear": "Očisti povijest",
- "historyNote": "Zadnjih 20 ostaje samo na ovom Macu.",
- "historyTable": "Tablica"
+ "historyNote": "Zadnjih 20, samo na ovom Macu. Kodovi za prijavu nikad se ne čuvaju i ništa ne ide u sigurnosne kopije.",
+ "historyTable": "Tablica",
+ "historyNoKeep": "Ne čuva se",
+ "historyDelete": "Izbriši ovu stavku",
+ "historyOffShort": "Isklj."
 }

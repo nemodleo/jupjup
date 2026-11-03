@@ -83,6 +83,9 @@
  "historyOff": "Lịch sử đang tắt",
  "historyKeep": "Giữ lịch sử",
  "historyClear": "Xoá lịch sử",
- "historyNote": "20 mục gần nhất chỉ lưu trên máy Mac này.",
- "historyTable": "Bảng"
+ "historyNote": "20 mục gần nhất, chỉ trên máy Mac này. Mã đăng nhập không bao giờ được giữ và không có gì vào bản sao lưu.",
+ "historyTable": "Bảng",
+ "historyNoKeep": "Không lưu",
+ "historyDelete": "Xóa mục này",
+ "historyOffShort": "Tắt"
 }

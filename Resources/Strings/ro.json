@@ -83,6 +83,9 @@
  "historyOff": "Istoricul este dezactivat",
  "historyKeep": "Păstrează istoricul",
  "historyClear": "Șterge istoricul",
- "historyNote": "Ultimele 20 rămân doar pe acest Mac.",
- "historyTable": "Tabel"
+ "historyNote": "Ultimele 20, doar pe acest Mac. Codurile de conectare nu sunt păstrate niciodată și nimic nu ajunge în backupuri.",
+ "historyTable": "Tabel",
+ "historyNoKeep": "Nu se păstrează",
+ "historyDelete": "Șterge acest element",
+ "historyOffShort": "Dezactivat"
 }

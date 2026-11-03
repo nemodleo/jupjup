@@ -83,6 +83,9 @@
  "historyOff": "Historie je vypnutá",
  "historyKeep": "Uchovávat historii",
  "historyClear": "Vymazat historii",
- "historyNote": "Posledních 20 zůstává jen v tomto Macu.",
- "historyTable": "Tabulka"
+ "historyNote": "Posledních 20, jen na tomto Macu. Přihlašovací kódy se nikdy neukládají a nic nejde do záloh.",
+ "historyTable": "Tabulka",
+ "historyNoKeep": "Neukládá se",
+ "historyDelete": "Smazat tuto položku",
+ "historyOffShort": "Vyp."
 }

@@ -83,6 +83,9 @@
  "historyOff": "Історію вимкнено",
  "historyKeep": "Зберігати історію",
  "historyClear": "Очистити історію",
- "historyNote": "Останні 20 зберігаються лише на цьому Mac.",
- "historyTable": "Таблиця"
+ "historyNote": "Останні 20, лише на цьому Mac. Коди входу ніколи не зберігаються, і нічого не потрапляє в резервні копії.",
+ "historyTable": "Таблиця",
+ "historyNoKeep": "Не зберігається",
+ "historyDelete": "Видалити запис",
+ "historyOffShort": "Вимк."
 }

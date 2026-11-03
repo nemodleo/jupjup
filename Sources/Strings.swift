@@ -91,6 +91,7 @@ struct Strings {
     var sectionPick, sectionApp, search, recent, retryAccurate, sameSpotAgain: String
     var updateCheck, updateGet: String
     var history, historyEmpty, historyOff, historyKeep, historyClear, historyNote, historyTable: String
+    var historyNoKeep, historyDelete, historyOffShort, obChoose, obLoginBody: String
     var updateAvailable: (String) -> String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
@@ -136,6 +137,8 @@ struct Strings {
         updateCheck = v("updateCheck"); updateGet = v("updateGet"); updateAvailable = { fill("updateAvailable", ["v": $0]) }
         history = v("history"); historyEmpty = v("historyEmpty"); historyOff = v("historyOff")
         historyKeep = v("historyKeep"); historyClear = v("historyClear"); historyNote = v("historyNote"); historyTable = v("historyTable")
+        historyNoKeep = v("historyNoKeep"); historyDelete = v("historyDelete"); historyOffShort = v("historyOffShort")
+        obChoose = v("obChoose"); obLoginBody = v("obLoginBody")
         pickWindow = v("pickWindow"); spaceDrag = v("spaceDrag"); dragSelect = v("dragSelect"); spaceWindow = v("spaceWindow")
         sameSpot = { fill("sameSpot", ["s": $0]) }
         escCancel = v("escCancel"); aboutTitle = v("aboutTitle"); aboutBody = fill("aboutBody", ["version": Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""])

@@ -83,6 +83,9 @@
  "historyOff": "ปิดประวัติอยู่",
  "historyKeep": "เก็บประวัติ",
  "historyClear": "ล้างประวัติ",
- "historyNote": "เก็บ 20 รายการล่าสุดไว้ใน Mac เครื่องนี้เท่านั้น",
- "historyTable": "ตาราง"
+ "historyNote": "20 รายการล่าสุด เก็บไว้ในแม็คเครื่องนี้เท่านั้น ไม่เก็บรหัสยืนยัน และไม่เข้าไปในข้อมูลสำรอง",
+ "historyTable": "ตาราง",
+ "historyNoKeep": "ไม่เก็บ",
+ "historyDelete": "ลบรายการนี้",
+ "historyOffShort": "ปิด"
 }

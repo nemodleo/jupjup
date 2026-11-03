@@ -83,6 +83,9 @@
  "historyOff": "L’historique est désactivé",
  "historyKeep": "Garder l’historique",
  "historyClear": "Effacer l’historique",
- "historyNote": "Les 20 derniers restent sur ce Mac uniquement.",
- "historyTable": "Tableau"
+ "historyNote": "Les 20 derniers, sur ce Mac uniquement. Les codes de connexion ne sont jamais gardés, et rien ne va dans les sauvegardes.",
+ "historyTable": "Tableau",
+ "historyNoKeep": "Non conservé",
+ "historyDelete": "Supprimer cet élément",
+ "historyOffShort": "Désactivé"
 }

@@ -83,6 +83,9 @@
  "historyOff": "Az előzmények ki vannak kapcsolva",
  "historyKeep": "Előzmények megőrzése",
  "historyClear": "Előzmények törlése",
- "historyNote": "Az utolsó 20 csak ezen a Macen marad.",
- "historyTable": "Táblázat"
+ "historyNote": "Az utolsó 20, csak ezen a Macen. A belépési kódokat sosem őrzi meg, és semmi sem kerül a biztonsági mentésekbe.",
+ "historyTable": "Táblázat",
+ "historyNoKeep": "Nem marad meg",
+ "historyDelete": "Elem törlése",
+ "historyOffShort": "Ki"
 }

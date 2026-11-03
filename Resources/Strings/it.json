@@ -83,6 +83,9 @@
  "historyOff": "La cronologia è disattivata",
  "historyKeep": "Conserva cronologia",
  "historyClear": "Cancella cronologia",
- "historyNote": "Gli ultimi 20 restano solo su questo Mac.",
- "historyTable": "Tabella"
+ "historyNote": "Gli ultimi 20, solo su questo Mac. I codici di accesso non vengono mai salvati e niente finisce nei backup.",
+ "historyTable": "Tabella",
+ "historyNoKeep": "Non salvato",
+ "historyDelete": "Elimina questo elemento",
+ "historyOffShort": "Disattivato"
 }

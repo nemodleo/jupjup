@@ -83,6 +83,9 @@
  "historyOff": "Verlauf ist aus",
  "historyKeep": "Verlauf behalten",
  "historyClear": "Verlauf löschen",
- "historyNote": "Die letzten 20 bleiben nur auf diesem Mac.",
- "historyTable": "Tabelle"
+ "historyNote": "Die letzten 20, nur auf diesem Mac. Anmeldecodes werden nie gespeichert, und nichts davon landet in Backups.",
+ "historyTable": "Tabelle",
+ "historyNoKeep": "Nicht gespeichert",
+ "historyDelete": "Diesen Eintrag löschen",
+ "historyOffShort": "Aus"
 }

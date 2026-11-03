@@ -83,6 +83,9 @@
  "historyOff": "Historik er slået fra",
  "historyKeep": "Gem historik",
  "historyClear": "Ryd historik",
- "historyNote": "De seneste 20 bliver kun på denne Mac.",
- "historyTable": "Tabel"
+ "historyNote": "De seneste 20, kun på denne Mac. Loginkoder gemmes aldrig, og intet kommer med i sikkerhedskopier.",
+ "historyTable": "Tabel",
+ "historyNoKeep": "Gemmes ikke",
+ "historyDelete": "Slet dette element",
+ "historyOffShort": "Fra"
 }

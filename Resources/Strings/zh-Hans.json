@@ -104,6 +104,11 @@
  "historyOff": "未保留历史记录",
  "historyKeep": "保留历史记录",
  "historyClear": "清除全部记录",
- "historyNote": "最近 20 条仅保存在这台 Mac 上。",
- "historyTable": "表格"
+ "historyNote": "最近 20 条只保存在这台 Mac 上。验证码不保存，也不会进入备份。",
+ "historyTable": "表格",
+ "historyNoKeep": "不留记录",
+ "historyDelete": "删除此记录",
+ "historyOffShort": "关闭",
+ "obChoose": "可选",
+ "obLoginBody": "需要保持运行，快捷键才会生效。也可以在菜单中更改。"
 }

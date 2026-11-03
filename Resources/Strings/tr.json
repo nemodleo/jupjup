@@ -83,6 +83,9 @@
  "historyOff": "Geçmiş kapalı",
  "historyKeep": "Geçmişi tut",
  "historyClear": "Geçmişi temizle",
- "historyNote": "Son 20 kayıt yalnızca bu Mac’te kalır.",
- "historyTable": "Tablo"
+ "historyNote": "Son 20 kayıt, yalnızca bu Mac'te. Giriş kodları asla saklanmaz ve hiçbiri yedeklere girmez.",
+ "historyTable": "Tablo",
+ "historyNoKeep": "Saklanmaz",
+ "historyDelete": "Bu öğeyi sil",
+ "historyOffShort": "Kapalı"
 }

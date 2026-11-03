@@ -83,6 +83,9 @@
  "historyOff": "السجل متوقف",
  "historyKeep": "الاحتفاظ بالسجل",
  "historyClear": "مسح السجل",
- "historyNote": "تبقى آخر 20 على هذا الماك فقط.",
- "historyTable": "جدول"
+ "historyNote": "آخر 20 فقط على هذا الـ Mac. لا تُحفظ رموز الدخول أبدًا، ولا يدخل شيء منها في النسخ الاحتياطية.",
+ "historyTable": "جدول",
+ "historyNoKeep": "لا يُحفظ",
+ "historyDelete": "حذف هذا العنصر",
+ "historyOffShort": "متوقف"
 }

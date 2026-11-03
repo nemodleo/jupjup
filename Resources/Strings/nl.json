@@ -83,6 +83,9 @@
  "historyOff": "Geschiedenis staat uit",
  "historyKeep": "Geschiedenis bewaren",
  "historyClear": "Geschiedenis wissen",
- "historyNote": "De laatste 20 blijven alleen op deze Mac.",
- "historyTable": "Tabel"
+ "historyNote": "De laatste 20, alleen op deze Mac. Inlogcodes worden nooit bewaard en niets gaat mee in back-ups.",
+ "historyTable": "Tabel",
+ "historyNoKeep": "Niet bewaard",
+ "historyDelete": "Dit item verwijderen",
+ "historyOffShort": "Uit"
 }

@@ -588,14 +588,14 @@ struct MenuView: View {
         .onHover { hoverLang = $0 }
     }
 
-    /// 기록 한 줄: 가장 최근에 담은 글 첫머리를 옅게, 누르면 기록 화면으로
+    /// 기록 한 줄: 개수만 옅게(글은 보이지 않게 — 메뉴를 열면 화면 공유에 비치므로), 누르면 기록 화면으로
     private var historyRow: some View {
         Button { state.page = .history } label: {
             HStack(spacing: 6) {
                 Text(L.s.history).font(Fonts.font(12.5)).foregroundStyle(Color.inkSub)
                 Spacer(minLength: 12)
-                Text(history.entries.first?.title ?? "").font(Fonts.font(11)).foregroundStyle(Color.inkFaint)
-                    .lineLimit(1).truncationMode(.tail)
+                Text(settings.history ? (history.entries.isEmpty ? "" : "\(history.entries.count)") : L.s.historyOffShort)
+                    .font(Fonts.font(11)).foregroundStyle(Color.inkFaint).lineLimit(1)
                 Image(systemName: "chevron.forward").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.inkFaint)
             }
             .padding(.horizontal, 8).frame(height: 28)

@@ -104,6 +104,11 @@
  "historyOff": "기록을 남기지 않아요",
  "historyKeep": "기록 남기기",
  "historyClear": "기록 모두 지우기",
- "historyNote": "최근 20개를 이 맥에만 둬요.",
- "historyTable": "표"
+ "historyNote": "최근 20개를 이 맥에만 둬요. 인증번호는 남기지 않고, 백업에도 안 들어가요.",
+ "historyTable": "표",
+ "historyNoKeep": "기록 안 남김",
+ "historyDelete": "이 기록 지우기",
+ "historyOffShort": "꺼짐",
+ "obChoose": "고르기",
+ "obLoginBody": "켜져 있어야 단축키가 들어요. 메뉴에서도 바꿀 수 있어요."
 }

@@ -83,6 +83,9 @@
  "historyOff": "Historia jest wyłączona",
  "historyKeep": "Zachowuj historię",
  "historyClear": "Wyczyść historię",
- "historyNote": "Ostatnie 20 zostaje tylko na tym Macu.",
- "historyTable": "Tabela"
+ "historyNote": "Ostatnie 20, tylko na tym Macu. Kody logowania nigdy nie są zapisywane i nic nie trafia do kopii zapasowych.",
+ "historyTable": "Tabela",
+ "historyNoKeep": "Nie zapisano",
+ "historyDelete": "Usuń ten element",
+ "historyOffShort": "Wył."
 }

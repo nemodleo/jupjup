@@ -83,6 +83,9 @@
  "historyOff": "O histórico está desativado",
  "historyKeep": "Manter histórico",
  "historyClear": "Limpar histórico",
- "historyNote": "Os últimos 20 ficam só neste Mac.",
- "historyTable": "Tabela"
+ "historyNote": "Os últimos 20, só neste Mac. Códigos de acesso nunca são guardados e nada vai para os backups.",
+ "historyTable": "Tabela",
+ "historyNoKeep": "Não guardado",
+ "historyDelete": "Apagar este item",
+ "historyOffShort": "Desativado"
 }
