@@ -48,5 +48,6 @@
     "mail": {
       "where": "사이트 저장소 nemodleo/jupjup-web 의 email/(brand.json·samples.json)"
     }
-  }
+  },
+  "servicekit_version": "e282829"
 }
