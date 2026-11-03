@@ -13,12 +13,39 @@
   "modules": {
     "contact": {
       "file": "CONTACT",
-      "set": "make contact EMAIL=…"
+      "set": "make contact EMAIL=…",
+      "files": [
+        "CONTACT",
+        "tools/set_contact.sh",
+        "Makefile",
+        "Sources/About.swift",
+        "project.yml",
+        "PRIVACY.md",
+        "README.md",
+        "README.ko.md"
+      ],
+      "adapted": "줍줍이 원본. 앱 '줍줍에 대하여' 창에 메일 링크(Info.plist JJContactEmail ← build.sh·make_dmg.sh가 CONTACT를 넘김)",
+      "since": "e282829"
     },
     "release": {
       "site_repo": "nemodleo/jupjup-web",
       "notes": "docs/releases/<버전>.md",
-      "client": "Sources/Update.swift"
+      "client": "Sources/Update.swift",
+      "files": [
+        "Sources/Update.swift",
+        ".github/workflows/notify-site.yml",
+        "Makefile",
+        "docs/RELEASE.md",
+        "docs/releases/1.2.md"
+      ],
+      "adapted": "줍줍이 원본. 클라이언트는 모듈의 UpdateChecker.swift가 아니라 앱 자체 Update.swift(Settings.updateCheck·메뉴 UpdateRow·Reporting 신호와 묶임)",
+      "skipped": [
+        {
+          "part": "clients/UpdateChecker.swift",
+          "why": "같은 일을 하는 Update.swift가 먼저 있었음(이걸 일반화한 게 모듈 쪽)"
+        }
+      ],
+      "since": "e282829"
     },
     "privacy": {
       "file": "PRIVACY.md",
@@ -26,28 +53,100 @@
         "local-history",
         "update-check",
         "reports"
-      ]
+      ],
+      "files": [
+        "PRIVACY.md"
+      ],
+      "adapted": "줍줍이 원본. 고르는 절 중 기기 안 기록·새 버전 확인·선택적 통계 세 개 사용",
+      "skipped": [
+        {
+          "part": "계정과 데이터 삭제 절",
+          "why": "계정·서버 없음"
+        }
+      ],
+      "since": "e282829"
     },
     "analytics": {
       "file": "Sources/Reporting.swift",
       "sentry": true,
       "telemetrydeck": true,
-      "default_on": true
+      "default_on": true,
+      "files": [
+        "Sources/Reporting.swift",
+        "project.yml"
+      ],
+      "adapted": "줍줍이 원본. 키 이름은 JJSentryDSN·JJTelemetryAppID(모듈은 SK…), 켜고 끄기는 Settings.reports · 키는 report.env(git 제외)에서",
+      "since": "e282829"
     },
     "design": {
       "canvas": "https://claude.ai/artifact/Gj9b2oJqebV8b7GgpkGJ3o",
       "tool": "claude.ai 디자인 캔버스(Easel 아님)",
       "current": "1번 보드 '지금 버전'(Current.dc.html)",
-      "snapshot": "Jupjup -snapshot <폴더> [-lang en] 로 앱 화면 그림"
+      "snapshot": "Jupjup -snapshot <폴더> [-lang en] 로 앱 화면 그림",
+      "files": [
+        "Sources/main.swift"
+      ],
+      "adapted": "캔버스는 Easel이 아니라 claude.ai 디자인 캔버스(Gj9b2oJqebV8b7GgpkGJ3o). 보드 이름은 모듈 규칙(00-current…) 대신 '1 · 지금 버전'처럼 번호+제목. 지금 버전 보드는 Jupjup -snapshot 그림으로 (main.swift의 Snapshot)",
+      "skipped": [
+        {
+          "part": "보드 파일 이름 규칙(00-/50-/90-)",
+          "why": "기존 캔버스 제목 체계를 유지 — 옮기면 링크·기록이 끊김"
+        },
+        {
+          "part": "tokens.json",
+          "why": "캔버스 형식에 토큰 파일이 없음 — tokens_check는 Current.dc.html과 직접 비교"
+        }
+      ],
+      "since": "e282829"
     },
     "mac-build": {
       "build": "make build (build.sh)",
       "cert": "make cert (Jupjup Dev)",
-      "dmg": "make dmg"
+      "dmg": "make dmg",
+      "files": [
+        "build.sh",
+        "tools/make_cert.sh",
+        "tools/make_dmg.sh",
+        "Makefile"
+      ],
+      "adapted": "줍줍이 원본. 빌드는 애드혹 → 설치본만 'Jupjup Dev'로 다시 서명(SPM 타깃이 팀을 요구해서)",
+      "since": "e282829"
     },
     "mail": {
       "where": "사이트 저장소 nemodleo/jupjup-web 의 email/(brand.json·samples.json)"
     }
   },
-  "servicekit_version": "e282829"
+  "servicekit_version": "e282829",
+  "decisions": {
+    "aae098f": {
+      "decision": "skip",
+      "why": "스킬 운영 규칙(올리는 기준)만 바뀜 — 프로젝트에 반영할 것 없음",
+      "date": "2026-11-03"
+    },
+    "8d5c3cf": {
+      "decision": "skip",
+      "why": "플라이휠 운영 방식만 바뀜(급함 표시는 제목의 설명 글자) — 프로젝트에 반영할 것 없음",
+      "date": "2026-11-03"
+    },
+    "809e539": {
+      "decision": "skip",
+      "why": "대시보드·운영 방식만 바뀜 — 프로젝트에 반영할 것 없음",
+      "date": "2026-11-03"
+    },
+    "cb3c4c5": {
+      "decision": "skip",
+      "why": "대시보드·운영 방식만 바뀜 — 프로젝트에 반영할 것 없음",
+      "date": "2026-11-03"
+    },
+    "6f27847": {
+      "decision": "skip",
+      "why": "스킬 자체 대시보드 디자인 기록·design 설명 추가 — 줍줍은 이미 앱 스냅샷 방식이라 반영할 것 없음",
+      "date": "2026-11-03"
+    },
+    "8ab1404": {
+      "decision": "skip",
+      "why": "web/엔 내보낼 파일만 있음(확인), 앱은 이미 -snapshot으로 보드를 찍음",
+      "date": "2026-11-03"
+    }
+  }
 }
