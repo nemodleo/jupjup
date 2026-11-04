@@ -116,7 +116,7 @@
       "where": "사이트 저장소 nemodleo/jupjup-web 의 email/(brand.json·samples.json)"
     }
   },
-  "servicekit_version": "5701255",
+  "servicekit_version": "d243611",
   "decisions": {
     "aae098f": {
       "decision": "skip",
@@ -230,6 +230,14 @@
       "date": "2026-11-03",
       "modules": [
         "공통 규칙"
+      ]
+    },
+    "d243611": {
+      "decision": "apply",
+      "why": "확인함: build.sh가 이미 --preserve-metadata=entitlements,flags로 권한을 유지하고 샌드박스 권한 파일도 없음 — 바꿀 것 없음",
+      "date": "2026-11-04",
+      "modules": [
+        "mac-build"
       ]
     }
   }
