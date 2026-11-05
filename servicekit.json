@@ -116,7 +116,7 @@
       "where": "사이트 저장소 nemodleo/jupjup-web 의 email/(brand.json·samples.json)"
     }
   },
-  "servicekit_version": "d243611",
+  "servicekit_version": "6182f2e",
   "decisions": {
     "aae098f": {
       "decision": "skip",
@@ -238,6 +238,22 @@
       "date": "2026-11-04",
       "modules": [
         "mac-build"
+      ]
+    },
+    "d081ab2": {
+      "decision": "apply",
+      "why": "세 곳 다: secrets.py check --all 오탐·누출 0, install로 .git/hooks/pre-commit 연결, 가짜 키 막힘 확인. 디자인 훅은 전역 설정이라 따로 할 일 없음",
+      "date": "2026-11-05",
+      "modules": [
+        "공통 규칙"
+      ]
+    },
+    "bf01204": {
+      "decision": "apply",
+      "why": "세 곳 다: secrets.py check --all 오탐·누출 0, install로 .git/hooks/pre-commit 연결, 가짜 키 막힘 확인. 디자인 훅은 전역 설정이라 따로 할 일 없음",
+      "date": "2026-11-05",
+      "modules": [
+        "공통 규칙"
       ]
     }
   }
