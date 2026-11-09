@@ -255,6 +255,23 @@
       "modules": [
         "공통 규칙"
       ]
+    },
+    "1f5ef87": {
+      "decision": "hold",
+      "why": "copy_check·render_check 추가(design) — 다음에 이 프로젝트를 열 때 검사를 돌려 고침(사용자 결정)",
+      "date": "2026-11-09",
+      "modules": [
+        "design",
+        "mail"
+      ]
+    },
+    "0cb540b": {
+      "decision": "hold",
+      "why": "copy_check·render_check 추가(design) — 다음에 이 프로젝트를 열 때 검사를 돌려 고침(사용자 결정)",
+      "date": "2026-11-09",
+      "modules": [
+        "design"
+      ]
     }
   }
 }
