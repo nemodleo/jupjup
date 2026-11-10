@@ -304,6 +304,20 @@
       "modules": [
         "공통 규칙"
       ]
+    },
+    "7bd67c3": {
+      "decision": "hold",
+      "why": "모듈 README 확인 절 고정 — 다음에 이 프로젝트를 열 때 붙인 모듈마다 확인 절을 돌려 flywheel.py verify로 남김(사용자 결정)",
+      "date": "2026-11-10",
+      "modules": [
+        "analytics",
+        "contact",
+        "design",
+        "mac-build",
+        "mail",
+        "privacy",
+        "release"
+      ]
     }
   }
 }
