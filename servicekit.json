@@ -52,8 +52,8 @@
       ],
       "since": "e282829",
       "verified": {
-        "date": "2026-11-11",
-        "what": "gh run list -w notify-site -R nemodleo/jupjup → v1.3(11-03) 성공 · sync-release(jupjup-web) 최근 5회 성공(마지막 11-10) · curl version.json → 1.3 = 최신 릴리스 v1.3. 못 봄: defaults write updateURL 뒤 앱 메뉴 '새 버전' 확인(사용자 설정 쓰기·앱 재실행이라 안 함)",
+        "date": "2026-11-27",
+        "what": "실제 알림 배너·권한 창·배너 눌렀을 때는 아직 안 봄(설치된 앱을 바꿔야 해서, 다음 설치 때 RELEASE.md 손으로 확인 줄대로). 된 것: 임시 폴더 빌드 성공·새 경고 0, 규칙 시험 23개 통과(tools/update_test.swift), 스냅샷 menu-update-os(.png/-en.png)에서 'macOS 26부터' 줄 잘림 없음. 브랜치 nemodleo/update-notice-banner, 미출시. min_os는 사이트 pages.py에 아직 없음",
         "result": "partial"
       }
     },
@@ -119,9 +119,9 @@
       ],
       "since": "e282829",
       "verified": {
-        "date": "2026-11-11",
-        "what": "맥 앱이라 render_check 두 줄 n/a(어제 1600폭 어절13·대비22·12px63은 검사 적용 잘못). 남은 실패: copy_check Resources/Strings/ko.json:66 aboutBody '담아 둡니다' 하십시오체 1곳 · tokens_check Theme.swift↔캔버스 Current.dc.html 앱에만 #B04A31(밝은 모드 sealText, 1번 보드에 밝은 모드 없음) · 캔버스에 1.3에 반영된 제안 보드 14·15(사이트 13도)가 남음. 1번 보드 머리 2026-11-03·1.3 = 설치본 1.3(v1.3 뒤 소스 변경 없음) 통과. 못 봄: 스냅샷 나란히·빈/오류/기다림·실제 크기 글자·어두운 모드(앱 안 띄움 — -snapshot이 사용자 언어·모드 설정을 잠깐 바꿈)",
-        "result": "fail"
+        "date": "2026-11-27",
+        "what": "시스템 알림은 OS가 그려 보드와 실제 배너를 나란히 못 봄(설치 뒤 손으로). 된 것: 제안 보드→승인(2026-11-26)→구현→1번 지금 버전 보드 반영(머리 날짜·버전 올림, 메뉴 'macOS 낮음' 줄은 스냅샷과 글자·치수 같음)→제안 보드 지움, elements_check 종료 0, copy_check --brief 걸린 것 없음, ko.json 새 문구 걸린 것 없음(aboutBody 하십시오체는 원래 있던 것)",
+        "result": "partial"
       }
     },
     "mac-build": {
