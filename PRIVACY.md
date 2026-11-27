@@ -1,6 +1,6 @@
 # Privacy Policy · 개인정보 처리방침
 
-*Last updated: 2026-11-03 · [한국어](#한국어)*
+*Last updated: 2026-11-26 · [한국어](#한국어)*
 
 ## In one sentence
 
@@ -16,7 +16,7 @@ Jupjup reads text on your screen **on your Mac** and never uploads or logs what 
 
 ## Update check
 
-Once at launch and once a day, Jupjup downloads `https://jupjup.d-t-it.com/version.json` (a tiny file with the latest version number) to tell you in the menu when a new version is out. It is a plain request with no cookies and no identifiers; nothing about you or your screen is sent. Like any web request, the site’s host (Cloudflare) sees your IP address. Turn it off in the menu (*Check for Updates*). Jupjup never downloads or installs an update by itself.
+Once at launch and once a day, Jupjup downloads `https://jupjup.d-t-it.com/version.json` (a tiny file with the latest version number) to tell you in the menu when a new version is out. It is a plain request with no cookies and no identifiers; nothing about you or your screen is sent. Like any web request, the site’s host (Cloudflare) sees your IP address. When a new version is out, Jupjup also shows one macOS notification for it, alongside the menu line. It asks for notification permission only then, the first time it has something to tell you; if you decline, the menu line still appears. The notification is made on your Mac and sends nothing. Turn it off in the menu (*Check for Updates*). Jupjup never downloads or installs an update by itself.
 
 ## Optional error & usage reports
 
@@ -85,7 +85,7 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 
 # 한국어
 
-*마지막 수정: 2026-11-03*
+*마지막 수정: 2026-11-26*
 
 ## 한 문장으로
 
@@ -101,7 +101,7 @@ Email [jupjup@d-t-it.com](mailto:jupjup@d-t-it.com), or open an issue at [github
 
 ## 새 버전 확인
 
-켤 때 한 번, 그 뒤 하루에 한 번 `https://jupjup.d-t-it.com/version.json`(최신 버전 번호만 든 작은 파일)을 받아, 새 버전이 나오면 메뉴에 알려 줘요. 쿠키도 식별자도 없는 단순한 요청이고, 사용자나 화면에 관한 건 아무것도 보내지 않아요. 여느 웹 요청처럼 사이트를 맡은 Cloudflare는 IP 주소를 볼 수 있어요. 메뉴의 *새 버전 확인*으로 끌 수 있고, 줍줍이 스스로 업데이트를 내려받거나 설치하지는 않아요.
+켤 때 한 번, 그 뒤 하루에 한 번 `https://jupjup.d-t-it.com/version.json`(최신 버전 번호만 든 작은 파일)을 받아, 새 버전이 나오면 메뉴에 알려 줘요. 쿠키도 식별자도 없는 단순한 요청이고, 사용자나 화면에 관한 건 아무것도 보내지 않아요. 여느 웹 요청처럼 사이트를 맡은 Cloudflare는 IP 주소를 볼 수 있어요. 새 버전이 나오면 메뉴 줄과 함께 macOS 알림으로도 한 번 알려 줘요. 알림 권한은 그때, 처음 알릴 일이 생겼을 때 물어요. 거절해도 메뉴 줄은 떠요. 알림은 이 맥 안에서 만들어지고 아무것도 보내지 않아요. 메뉴의 *새 버전 확인*으로 끌 수 있고, 줍줍이 스스로 업데이트를 내려받거나 설치하지는 않아요.
 
 ## 선택적 오류·사용 통계
 
