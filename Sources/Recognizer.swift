@@ -218,18 +218,30 @@ enum Recognizer {
     /// 그래서:
     /// 1차 — 내 언어를 앞에 두고 읽는다. 결과가 내 언어로 판별되고 충분하면 끝(대부분 여기서 끝, 1회).
     /// 라틴 — 결과가 프랑스어·베트남어처럼 다른 라틴 문자 언어면, 그 언어를 앞에 두고 한 번 더(악센트 살림).
+    /// 라틴(판별 안 됨) — 판별이 안 됐어도 읽힌 글자가 거의 다 라틴 문자면 라틴 언어를 앞에 세워 한 번 더.
+    ///   한국어가 앞인 1차는 성조·악센트·위첨자를 빼고 읽어서(macOS 27 실측: 베트남어가 "Phuong phap"으로, km²가 km3으로)
+    ///   판별이 기준에 못 미치거나(vi 0.59) 엉뚱한 언어(id)로 나온다. 그대로 두면 부호가 빠진 채 끝난다.
     /// 넓게 — 1차가 엉터리면(글자가 거의 없거나 판별 불가) 문자권마다 맨 앞을 바꿔 읽고 점수가 높은 결과.
     /// 점수 = 읽은 글자 수 × 신뢰도. 엉터리 결과는 신뢰도가 높아도 글자가 "-=" 처럼 몇 개 없다.
     static func recognize(_ image: CGImage, prefer: [String] = OCRLanguages.primary(), fallback: Bool = true) -> Recognized {
-        let first = read(image, languages: OCRLanguages.firstPass(prefer), autoDetect: false)
+        let ink = Ink(image) // 여러 번 읽어도 그림은 한 번만 푼다
+        let first = read(image, languages: OCRLanguages.firstPass(prefer), autoDetect: false, ink: ink)
         let lang = OCRLanguages.detect(first.result.text)
         let mine = Set(prefer.map { OCRLanguages.base($0) })
 
         if let lang, mine.contains(lang), first.confidence >= 0.6, score(first) >= 3 { return first.result }
 
         if let lang, let latin = OCRLanguages.latinCode(lang), fallback || prefer.contains(latin) {
-            let again = read(image, languages: [latin] + OCRLanguages.latin, autoDetect: false)
+            let again = read(image, languages: [latin] + OCRLanguages.latin, autoDetect: false, ink: ink)
             return score(again) >= score(first) * 0.95 ? again.result : first.result
+        }
+
+        if OCRLanguages.mostlyLatin(first.result.text) {
+            let guess = OCRLanguages.latinGuess(first.result.text)
+            if fallback || prefer.contains(guess) {
+                let again = read(image, languages: [guess] + OCRLanguages.latin, autoDetect: false, ink: ink)
+                if score(again) >= score(first) * 0.95 { return again.result }
+            }
         }
 
         var best = first
@@ -237,7 +249,7 @@ enum Recognizer {
         let leads = fallback ? OCRLanguages.otherScripts(excluding: prefer)
                              : prefer.dropFirst().filter { !OCRLanguages.latin.contains($0) }
         for lead in leads {
-            let r = read(image, languages: [lead, "en-US"], autoDetect: false)
+            let r = read(image, languages: [lead, "en-US"], autoDetect: false, ink: ink)
             if score(r) > score(best) * 1.05 { best = r }
         }
         return best.result
@@ -249,7 +261,8 @@ enum Recognizer {
     }
 
     /// Vision 한 번 실행. 결과와 글자 수로 무게를 단 평균 신뢰도(0…1)
-    static func read(_ image: CGImage, languages: [String], autoDetect: Bool) -> (result: Recognized, confidence: Double) {
+    /// ink: 같은 그림을 여러 번 읽을 때 미리 풀어 둔 것(없으면 여기서 푼다)
+    static func read(_ image: CGImage, languages: [String], autoDetect: Bool, ink: Ink? = nil) -> (result: Recognized, confidence: Double) {
         let req = VNRecognizeTextRequest()
         req.recognitionLevel = .accurate
         req.usesLanguageCorrection = true
@@ -257,7 +270,8 @@ enum Recognizer {
         req.automaticallyDetectsLanguage = autoDetect
         try? VNImageRequestHandler(cgImage: image).perform([req])
         let w = CGFloat(image.width), h = CGFloat(image.height)
-        let obs = req.results ?? []
+        let obs = dropRepeats(req.results ?? [])
+        let ink = ink ?? Ink(image)
 
         func px(_ r: CGRect) -> CGRect { CGRect(x: r.minX * w, y: r.minY * h, width: r.width * w, height: r.height * h) }
 
@@ -269,13 +283,35 @@ enum Recognizer {
             total += n
             return Piece(rect: px(o.boundingBox), text: c.string)
         }
-        // 표 판단용: 한 관측 안에서도 낱말 사이가 크게 벌어지면 칸으로 쪼갠다
+        // 표 판단용: 한 관측 안에서도 낱말 사이가 크게 벌어지면 칸으로 쪼갠다.
+        // 낱말 상자의 좌우는 Vision 값을 그대로 믿지 않고 실제 획에 맞춘다(아래 Ink)
         let wordPieces = obs.flatMap { o -> [Piece] in
             guard let c = o.topCandidates(1).first else { return [] }
-            return Self.words(of: c, fallback: px(o.boundingBox)).map { Piece(rect: px($0.rect), text: $0.text) }
+            return Self.words(of: c, fallback: px(o.boundingBox)).map {
+                let r = px($0.rect)
+                return Piece(rect: ink?.snap(r) ?? r, text: $0.text)
+            }
         }
         let result = Recognized(lines: group(pieces), table: detectTable(group(wordPieces)))
         return (result, total > 0 ? weight / total : 0)
+    }
+
+    /// 같은 글자를 두 번 읽은 관측을 뺀다. macOS 27의 Vision은 글자가 큰 표에서 한 줄을 통째로 읽은 관측과
+    /// 그 안의 숫자 하나를 따로 읽은 관측을 함께 돌려줄 때가 있다("1,204,500 1,388,000 …"과 "1,388,000").
+    /// 더 큰 관측에 70% 넘게 덮이고, 글(띄어쓰기 빼고)도 그 관측 글의 일부일 때만 뺀다
+    private static func dropRepeats(_ obs: [VNRecognizedTextObservation]) -> [VNRecognizedTextObservation] {
+        guard obs.count > 1 else { return obs }
+        let texts = obs.map { ($0.topCandidates(1).first?.string ?? "").filter { !$0.isWhitespace } }
+        return obs.enumerated().filter { i, o in
+            let a = o.boundingBox, area = a.width * a.height
+            guard !texts[i].isEmpty, area > 0 else { return true }
+            return !obs.enumerated().contains { j, p in
+                guard j != i else { return false }
+                let b = p.boundingBox, both = a.intersection(b)
+                guard !both.isNull, b.width * b.height > area * 1.3 else { return false }
+                return both.width * both.height >= area * 0.7 && texts[j].contains(texts[i])
+            }
+        }.map(\.element)
     }
 
     /// 후보 글을 공백 단위 낱말로 나누고 각 낱말의 상자를 구한다(정규화 좌표).
@@ -414,6 +450,54 @@ enum Recognizer {
     }
 }
 
+// MARK: 낱말 상자를 획에 맞추기
+
+/// Vision이 주는 낱말 상자는 좌우가 실제 글자보다 넓을 때가 있다(macOS 27 실측: 여러 숫자가 한 관측으로 묶이면
+/// 낱말 상자가 줄을 고르게 나눈 값으로 나와 90px 틈이 9px로 줄고, 따로 읽힌 숫자도 왼쪽으로 48px 부푼다).
+/// 그러면 열 사이 통로가 사라져 표의 칸이 뭉친다. 그래서 상자 안에서 획이 있는 첫 열과 끝 열로 좌우를 줄인다.
+/// 줄이기만 하고 넓히지는 않으며, 획을 못 찾으면 상자를 그대로 둔다.
+struct Ink {
+    private let w: Int, h: Int
+    private let gray: [UInt8] // 위에서 아래로, 한 픽셀 한 바이트
+
+    init?(_ image: CGImage) {
+        let w = image.width, h = image.height
+        guard w > 0, h > 0 else { return nil }
+        var buf = [UInt8](repeating: 0, count: w * h)
+        let drawn = buf.withUnsafeMutableBytes { p -> Bool in
+            guard let ctx = CGContext(data: p.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w,
+                                      space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue) else { return false }
+            ctx.interpolationQuality = .none
+            ctx.draw(image, in: CGRect(x: 0, y: 0, width: w, height: h))
+            return true
+        }
+        guard drawn else { return nil }
+        self.w = w; self.h = h; gray = buf
+    }
+
+    /// r: 그림 픽셀, 원점 왼쪽 아래(Piece와 같음)
+    func snap(_ r: CGRect) -> CGRect {
+        // 위아래 15%는 보지 않는다(가로 괘선·밑줄이 획으로 잡히지 않게)
+        let inset = r.height * 0.15
+        let top = max(0, h - Int(r.maxY - inset)), bottom = min(h - 1, h - Int(r.minY + inset))
+        let x0 = max(0, Int(r.minX)), x1 = min(w - 1, Int(r.maxX))
+        guard bottom - top >= 4, x1 - x0 >= 2 else { return r }
+        // 한 열 안에서 밝기가 크게 달라지면 획. 바탕뿐인 열도, 세로 괘선처럼 위아래가 똑같은 열도 획이 아니다
+        // (밝은 바탕·어두운 바탕 모두 같은 규칙)
+        func inked(_ x: Int) -> Bool {
+            var lo: UInt8 = 255, hi: UInt8 = 0
+            for y in top...bottom {
+                let v = gray[y * w + x]
+                if v < lo { lo = v }
+                if v > hi { hi = v }
+            }
+            return hi - lo > 48
+        }
+        guard let a = (x0...x1).first(where: inked), let b = (x0...x1).last(where: inked), b > a else { return r }
+        return CGRect(x: CGFloat(a), y: r.minY, width: CGFloat(b - a + 1), height: r.height)
+    }
+}
+
 // MARK: 미리 깨우기
 extension Recognizer {
     /// 앱을 켤 때 모든 문자권 모델을 한 번씩 돌려 둔다
@@ -480,6 +564,25 @@ enum OCRLanguages {
         r.processString(text)
         guard let (lang, p) = r.languageHypotheses(withMaximum: 1).first, p >= 0.6 else { return nil }
         return lang.rawValue
+    }
+
+    /// 읽힌 글자가 거의 다(90% 이상) 라틴 문자인지. 한글·한자가 섞인 글은 라틴 언어를 앞에 세우면 그 글자를 잃으니 아니라고 한다
+    static func mostlyLatin(_ text: String) -> Bool {
+        let letters = text.unicodeScalars.filter { $0.properties.isAlphabetic }
+        guard letters.count >= 3 else { return false }
+        let latin = letters.filter { $0.isASCII || (0x00C0...0x024F).contains($0.value) || (0x1E00...0x1EFF).contains($0.value) }
+        return latin.count * 10 >= letters.count * 9
+    }
+
+    /// 판별 확률이 기준에 못 미쳐도, 가설 가운데 가장 앞선 라틴 문자 언어(없으면 영어).
+    /// 성조가 빠진 베트남어는 vi 0.59처럼 기준 바로 아래에 걸린다
+    static func latinGuess(_ text: String) -> String {
+        let r = NLLanguageRecognizer()
+        r.processString(text)
+        for (lang, _) in r.languageHypotheses(withMaximum: 3).sorted(by: { $0.value > $1.value }) {
+            if let code = latin.first(where: { base($0) == lang.rawValue && supported.contains($0) }) { return code }
+        }
+        return "en-US"
     }
 
     /// 영어 말고 Vision이 읽을 수 있는 라틴 문자 언어면 그 코드
