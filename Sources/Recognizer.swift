@@ -224,7 +224,7 @@ enum Recognizer {
     /// 넓게 — 1차가 엉터리면(글자가 거의 없거나 판별 불가) 문자권마다 맨 앞을 바꿔 읽고 점수가 높은 결과.
     /// 점수 = 읽은 글자 수 × 신뢰도. 엉터리 결과는 신뢰도가 높아도 글자가 "-=" 처럼 몇 개 없다.
     static func recognize(_ image: CGImage, prefer: [String] = OCRLanguages.primary(), fallback: Bool = true) -> Recognized {
-        let ink = Ink(image) // 여러 번 읽어도 그림은 한 번만 푼다
+        let ink = Strokes(image) // 여러 번 읽어도 그림은 한 번만 푼다
         let first = read(image, languages: OCRLanguages.firstPass(prefer), autoDetect: false, ink: ink)
         let lang = OCRLanguages.detect(first.result.text)
         let mine = Set(prefer.map { OCRLanguages.base($0) })
@@ -262,7 +262,7 @@ enum Recognizer {
 
     /// Vision 한 번 실행. 결과와 글자 수로 무게를 단 평균 신뢰도(0…1)
     /// ink: 같은 그림을 여러 번 읽을 때 미리 풀어 둔 것(없으면 여기서 푼다)
-    static func read(_ image: CGImage, languages: [String], autoDetect: Bool, ink: Ink? = nil) -> (result: Recognized, confidence: Double) {
+    static func read(_ image: CGImage, languages: [String], autoDetect: Bool, ink: Strokes? = nil) -> (result: Recognized, confidence: Double) {
         let req = VNRecognizeTextRequest()
         req.recognitionLevel = .accurate
         req.usesLanguageCorrection = true
@@ -271,7 +271,7 @@ enum Recognizer {
         try? VNImageRequestHandler(cgImage: image).perform([req])
         let w = CGFloat(image.width), h = CGFloat(image.height)
         let obs = dropRepeats(req.results ?? [])
-        let ink = ink ?? Ink(image)
+        let ink = ink ?? Strokes(image)
 
         func px(_ r: CGRect) -> CGRect { CGRect(x: r.minX * w, y: r.minY * h, width: r.width * w, height: r.height * h) }
 
@@ -284,7 +284,7 @@ enum Recognizer {
             return Piece(rect: px(o.boundingBox), text: c.string)
         }
         // 표 판단용: 한 관측 안에서도 낱말 사이가 크게 벌어지면 칸으로 쪼갠다.
-        // 낱말 상자의 좌우는 Vision 값을 그대로 믿지 않고 실제 획에 맞춘다(아래 Ink)
+        // 낱말 상자의 좌우는 Vision 값을 그대로 믿지 않고 실제 획에 맞춘다(아래 Strokes)
         let wordPieces = obs.flatMap { o -> [Piece] in
             guard let c = o.topCandidates(1).first else { return [] }
             return Self.words(of: c, fallback: px(o.boundingBox)).map {
@@ -456,7 +456,7 @@ enum Recognizer {
 /// 낱말 상자가 줄을 고르게 나눈 값으로 나와 90px 틈이 9px로 줄고, 따로 읽힌 숫자도 왼쪽으로 48px 부푼다).
 /// 그러면 열 사이 통로가 사라져 표의 칸이 뭉친다. 그래서 상자 안에서 획이 있는 첫 열과 끝 열로 좌우를 줄인다.
 /// 줄이기만 하고 넓히지는 않으며, 획을 못 찾으면 상자를 그대로 둔다.
-struct Ink {
+struct Strokes {
     private let w: Int, h: Int
     private let gray: [UInt8] // 위에서 아래로, 한 픽셀 한 바이트
 
