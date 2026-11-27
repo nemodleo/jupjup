@@ -93,11 +93,12 @@ final class UpdateChecker {
         pending = nil
     }
 
-    /// 시스템 알림 한 번. 소리·배지 없음. 거절이면 조용히 끝(메뉴 줄은 그대로, 다시 묻지 않게 적어 둔다)
+    /// 시스템 알림 한 번. 소리·배지 없음. 거절이면 조용히 끝(메뉴 줄은 그대로, 다시 묻지 않게 적어 둔다).
+    /// 권한 창은 몇 초 뒤 사라지는 배너라 놓치기 쉽다 — 답하지 않고 넘긴 것(아직 안 정함)이면 적지 않고 다음 확인 때 다시 묻는다
     private func announce(_ info: UpdateInfo) async {
         let key = "updateNotified", center = UNUserNotificationCenter.current()
         guard (try? await center.requestAuthorization(options: [.alert])) == true else {
-            UserDefaults.standard.set(info.version, forKey: key)
+            if await center.notificationSettings().authorizationStatus == .denied { UserDefaults.standard.set(info.version, forKey: key) }
             return
         }
         let t = L.s, c = UNMutableNotificationContent()
@@ -109,6 +110,17 @@ final class UpdateChecker {
         c.userInfo = ["version": info.version, "url": info.url.absoluteString, "runsHere": info.runsHere]
         let req = UNNotificationRequest(identifier: "update-\(info.version)", content: c, trigger: nil)
         if (try? await center.add(req)) != nil { UserDefaults.standard.set(info.version, forKey: key) }
+    }
+
+    /// 진단용: 알림 권한이 어떤 상태인지
+    func permission() async -> String {
+        guard canNotify else { return "번들 없음" }
+        switch await UNUserNotificationCenter.current().notificationSettings().authorizationStatus {
+        case .authorized, .provisional: return "허용"
+        case .denied: return "거절"
+        case .notDetermined: return "아직 안 정함"
+        @unknown default: return "모름"
+        }
     }
 
     /// 알림을 눌렀을 때: 이 맥에서 도는 버전이면 메뉴 줄과 같이 내려받기 주소를, 아니면 소프트웨어 업데이트를 연다

@@ -198,7 +198,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if let up = Settings.shared.update {
                 print("새 버전 \(up.version) · \(up.url.absoluteString) · min_os \(up.minOS ?? "없음") · 이 맥(\(UpdateChecker.thisOS))에서 \(up.runsHere ? "돎" : "안 돎")")
             } else { print("새 버전 없음(또는 확인 실패)") }
-            exit(0)
+            Task { print("알림 권한: \(await u.permission()) · 알린 버전: \(UserDefaults.standard.string(forKey: "updateNotified") ?? "없음")"); exit(0) }
         }
     }
 
