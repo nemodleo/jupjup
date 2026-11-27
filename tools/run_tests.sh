@@ -30,6 +30,11 @@ mkdir -p "$OUT/tidy" && cp tools/tidy_test.swift "$OUT/tidy/main.swift"
 swiftc -O Sources/Recognizer.swift "$OUT/tidy/main.swift" -o "$OUT/tidy_test" 2>&1 | grep -E "error" && fail=1
 "$OUT/tidy_test" | tail -1 || fail=1
 
+echo "=== 3¾. 새 버전 알림 규칙"
+mkdir -p "$OUT/update" && cp tools/update_test.swift "$OUT/update/main.swift"
+swiftc -O Sources/UpdateRules.swift "$OUT/update/main.swift" -o "$OUT/update_test" 2>&1 | grep -E "error" && fail=1
+"$OUT/update_test" | tail -1 || fail=1
+
 echo "=== 4. 인식 중 화면 멈춤 (기준 1000ms)"
 if [ -x "$APP/Contents/MacOS/Jupjup" ]; then
   line=$("$APP/Contents/MacOS/Jupjup" -benchocr 2>/dev/null)

@@ -93,6 +93,10 @@ struct Strings {
     var history, historyEmpty, historyOff, historyKeep, historyClear, historyNote, historyTable: String
     var historyNoKeep, historyDelete, historyOffShort, obChoose, obLoginBody: String
     var updateAvailable: (String) -> String
+    var updateNoteTitle: (String) -> String
+    var updateOSTitle: (String, String) -> String
+    var updateNeedsOS: (String) -> String
+    var updateNoteBody, updateOSBody: String
     var pickWindow, spaceDrag, dragSelect, spaceWindow: String
     var sameSpot: (String) -> String
     var escCancel: String
@@ -135,6 +139,11 @@ struct Strings {
         sectionPick = v("sectionPick"); sectionApp = v("sectionApp"); search = v("search"); recent = v("recent")
         retryAccurate = v("retryAccurate"); sameSpotAgain = v("sameSpotAgain")
         updateCheck = v("updateCheck"); updateGet = v("updateGet"); updateAvailable = { fill("updateAvailable", ["v": $0]) }
+        let app = v("appName") // 알림 제목의 {a}
+        updateNoteTitle = { fill("updateNoteTitle", ["a": app, "v": $0]) }
+        updateOSTitle = { fill("updateOSTitle", ["a": app, "v": $0, "o": $1]) }
+        updateNeedsOS = { fill("updateNeedsOS", ["o": $0]) }
+        updateNoteBody = v("updateNoteBody"); updateOSBody = v("updateOSBody")
         history = v("history"); historyEmpty = v("historyEmpty"); historyOff = v("historyOff")
         historyKeep = v("historyKeep"); historyClear = v("historyClear"); historyNote = v("historyNote"); historyTable = v("historyTable")
         historyNoKeep = v("historyNoKeep"); historyDelete = v("historyDelete"); historyOffShort = v("historyOffShort")

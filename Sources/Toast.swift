@@ -120,6 +120,8 @@ final class ToastController {
     private var keyMonitor: Any?
     var onRetryAccurate: (() -> Void)?
     var onSameSpot: (() -> Void)?
+    /// 토스트가 화면에 떠 있는지(새 버전 알림을 미룰 때 본다)
+    var isShowing: Bool { panel?.isVisible == true }
 
     /// entry: 기록에서 다시 담을 때. 그때의 모양(한 줄·표·고친 글)으로 띄운다
     func show(_ kind: ToastModel.Kind, result: Recognized? = nil, backup: ClipboardBackup? = nil, busyCPU: Int? = nil, entry: HistoryEntry? = nil) {

@@ -86,6 +86,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         Reporting.start()
         Recognizer.warmUp()
+        // 고르기 화면이나 토스트가 떠 있는 동안에는 새 버전 알림을 미룬다
+        UpdateChecker.shared.isBusy = { [weak self] in self.map { $0.capture.isActive || $0.toast.isShowing } ?? false }
         UpdateChecker.shared.start()
         if Settings.shared.fastMode { LiveText.warmUp() }
         enableLoginOnFirstRun()
@@ -190,9 +192,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let u = UpdateChecker.shared
         print("지금 \(u.current) · 확인 주소 \(u.feed.absoluteString)")
         Settings.shared.updateCheck = true
+        u.notify = false // 진단은 결과만 찍는다. 알림·권한 창은 띄우지 않음
         u.check()
         DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-            if let up = Settings.shared.update { print("새 버전 \(up.version) · \(up.url.absoluteString)") } else { print("새 버전 없음(또는 확인 실패)") }
+            if let up = Settings.shared.update {
+                print("새 버전 \(up.version) · \(up.url.absoluteString) · min_os \(up.minOS ?? "없음") · 이 맥(\(UpdateChecker.thisOS))에서 \(up.runsHere ? "돎" : "안 돎")")
+            } else { print("새 버전 없음(또는 확인 실패)") }
             exit(0)
         }
     }
@@ -484,7 +489,10 @@ struct MenuView: View {
             textWidth(t.ocrMode, 12.5) + 14 + textWidth(t.modeFast, 11, .semibold) + textWidth(t.modeAccurate, 11, .semibold) + 34 + 10,
             textWidth(t.about, 12.5) + 24,
             textWidth(t.updateCheck, 12.5) + 8 + 36 + 18,
-            settings.update.map { textWidth(t.updateAvailable($0.version), 12.5, .medium) + textWidth(t.updateGet, 11.5) + 6 + 12 + 30 } ?? 0,
+            settings.update.map { u in
+                let get = u.runsHere ? t.updateGet : t.updateNeedsOS(osLabel(u.minOS ?? ""))
+                return textWidth(t.updateAvailable(u.version), 12.5, .medium) + textWidth(get, 11.5) + 6 + 12 + 30
+            } ?? 0,
             textWidth(t.quit, 12.5) + 50,
             18 + 8 + textWidth(t.appName, 17) + 16 + textWidth(t.tagline, 11) + 28, // 이름 + 태그라인이 다 보이게
         ]
@@ -524,7 +532,10 @@ struct MenuView: View {
             }
 
             // 새 버전이 있으면 줍기 줄 바로 아래 주홍 한 줄. 누르면 내려받기 페이지(자동 설치는 안 함)
-            if let u = settings.update { UpdateRow(info: u) { actions.update(u.url) } }
+            // 이 맥의 macOS가 낮아 못 쓰는 버전이면 "macOS 26부터", 누르면 소프트웨어 업데이트
+            if let u = settings.update {
+                UpdateRow(info: u) { if u.runsHere { actions.update(u.url) } else { NSWorkspace.shared.open(UpdateChecker.softwareUpdate) } }
+            }
 
             // 줍기(줄바꿈·표·모드·언어)와 앱(함께 열기·통계) 두 묶음 — 캔버스 10번 A
             section(L.s.sectionPick)
@@ -724,7 +735,7 @@ struct KeyCap: View {
     }
 }
 
-/// 새 버전 알림 줄: 옅은 주홍 바탕에 "새 버전 1.1" · "내려받기 ›"
+/// 새 버전 알림 줄: 옅은 주홍 바탕에 "새 버전 1.1" · "내려받기 ›" (macOS가 낮으면 "macOS 26부터 ›")
 struct UpdateRow: View {
     let info: UpdateInfo
     let action: () -> Void
@@ -736,7 +747,8 @@ struct UpdateRow: View {
                 Circle().fill(Color.seal).frame(width: 6, height: 6)
                 Text(L.s.updateAvailable(info.version)).font(Fonts.font(12.5, .medium)).foregroundStyle(Color.sealText)
                 Spacer(minLength: 4)
-                Text(L.s.updateGet).font(Fonts.font(11.5)).foregroundStyle(Color.sealText)
+                Text(info.runsHere ? L.s.updateGet : L.s.updateNeedsOS(osLabel(info.minOS ?? "")))
+                    .font(Fonts.font(11.5)).foregroundStyle(Color.sealText)
                 Image(systemName: "chevron.forward").font(.system(size: 9, weight: .semibold)).foregroundStyle(Color.sealText)
             }
             .padding(.horizontal, 8).frame(height: 28)
@@ -843,6 +855,14 @@ enum Snapshot {
         save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-fast.png")
         Settings.shared.update = UpdateInfo(version: "1.1", url: URL(string: "https://jupjup.d-t-it.com/")!)
         save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-update.png")
+        // macOS가 낮아 못 쓰는 새 버전(한국어·영어)
+        let keepUILang = Settings.shared.language
+        Settings.shared.update = UpdateInfo(version: "2.0", url: URL(string: "https://jupjup.d-t-it.com/")!, minOS: "26", runsHere: false)
+        for (lang, suffix) in [("ko", ""), ("en", "-en")] {
+            Settings.shared.language = Lang(rawValue: lang)
+            save(MenuView(settings: .shared, state: MenuState(), actions: .init(capture: {}, record: {}, about: {}, quit: {})), "\(dir)/menu-update-os\(suffix).png")
+        }
+        Settings.shared.language = keepUILang
         Settings.shared.update = nil
         Settings.shared.fastMode = keepFast
         Settings.shared.recentLanguages = keepRecent // 언어를 돌려 가며 그린 흔적이 사용자의 "최근"에 남지 않게
